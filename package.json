@@ -1,0 +1,23 @@
+{
+	"name": "lunchweb",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"dev": "nodemon server",
+		"start": "node server"
+	},
+	"author": "DJ1TJOO",
+	"license": "UNLICENSED",
+	"dependencies": {
+		"bcrypt": "^5.0.1",
+		"express": "^4.17.1",
+		"express-handlebars": "^5.3.3",
+		"mysql2": "^2.3.0",
+		"passport": "^0.4.1",
+		"passport-local": "^1.0.0"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.12"
+	}
+}
