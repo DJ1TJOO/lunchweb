@@ -9,7 +9,7 @@ const stringToCamel = (s) => {
 const isObject = (o) => o === Object(o) && !Array.isArray(o) && typeof o !== "function";
 
 // Makes obj keys with nested obj keys camel cased
-module.exports.toCamel = (obj) => {
+const toCamel = (obj) => {
 	if (isObject(obj)) {
 		const n = {};
 
@@ -25,6 +25,7 @@ module.exports.toCamel = (obj) => {
 
 	return obj;
 };
+module.exports.toCamel = toCamel;
 
 module.exports.checkEmpty = (fields, body) => {
 	for (let i = 0; i < fields.length; i++) {

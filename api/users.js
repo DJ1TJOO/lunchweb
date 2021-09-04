@@ -1,6 +1,8 @@
 const db = require("./helpers/db");
 const { toCamel, checkEmpty, objectToResponse } = require("./helpers/utils");
 
+const bcrypt = require("bcrypt");
+
 const { Router } = require("express");
 const router = Router();
 
@@ -39,6 +41,7 @@ router.get("/:id", (req, res) => {
 			}
 		})
 		.catch((error) => {
+			console.log(error);
 			// Mysql error
 			res.status(500).send({
 				success: false,
@@ -48,14 +51,6 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-	// Not loggedin return 401
-	if (!req.isAuthenticated()) {
-		return res.status(401).send({
-			success: false,
-			error: "unauthorized",
-		});
-	}
-
 	// Destructure body
 	const { firstName, lastName, email, leerlingNummer, password } = req.body;
 
@@ -152,6 +147,7 @@ router.post("/", async (req, res) => {
 			});
 		}
 	} catch (error) {
+		console.log(error);
 		// Mysql error
 		res.status(500).send({
 			success: false,
@@ -212,7 +208,7 @@ router.post("/", async (req, res) => {
 	// Hash password
 	const pwd = bcrypt.hashSync(password, 12);
 
-	db.query("INSERT INTO users (firstName,lastName,email,leerlingNummer,password) VALUES (?,?,?,?,?)", [firstName, lastName, email, leerlingNummer, pwd])
+	db.query("INSERT INTO users (first_name,last_name,email,leerling_nummer,pwd) VALUES (?,?,?,?,?)", [firstName, lastName, email, leerlingNummer, pwd])
 		.then(([results]) => {
 			// Select user from db without pwd
 			db.query("SELECT id,first_name,last_name,email,leerling_nummer,vendor FROM users WHERE email=?", [email])
@@ -232,6 +228,7 @@ router.post("/", async (req, res) => {
 					}
 				})
 				.catch((error) => {
+					console.log(error);
 					// Mysql error
 					res.status(500).send({
 						success: false,
@@ -240,6 +237,7 @@ router.post("/", async (req, res) => {
 				});
 		})
 		.catch((error) => {
+			console.log(error);
 			// Mysql error
 			res.status(500).send({
 				success: false,
@@ -280,6 +278,7 @@ router.patch("/:id", async (req, res) => {
 			});
 		}
 	} catch (error) {
+		console.log(error);
 		// Mysql error
 		res.status(500).send({
 			success: false,
@@ -390,6 +389,7 @@ router.patch("/:id", async (req, res) => {
 				});
 			}
 		} catch (error) {
+			console.log(error);
 			// Mysql error
 			res.status(500).send({
 				success: false,
@@ -495,6 +495,7 @@ router.patch("/:id", async (req, res) => {
 					}
 				})
 				.catch((error) => {
+					console.log(error);
 					// Mysql error
 					res.status(500).send({
 						success: false,
@@ -503,6 +504,7 @@ router.patch("/:id", async (req, res) => {
 				});
 		})
 		.catch((error) => {
+			console.log(error);
 			// Mysql error
 			res.status(500).send({
 				success: false,
@@ -557,6 +559,7 @@ router.delete(":id", async (req, res) => {
 			data: getResult[0],
 		});
 	} catch (error) {
+		console.log(error);
 		// Mysql error
 		res.status(500).send({
 			success: false,
