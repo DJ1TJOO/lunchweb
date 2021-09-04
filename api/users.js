@@ -269,12 +269,9 @@ router.patch("/:id", async (req, res) => {
 
 		// User not found
 		if (getResult[0]["count(*)"] < 1) {
-			return res.status(409).send({
+			return res.status(404).send({
 				success: false,
 				error: "not_found",
-				data: {
-					field: "email",
-				},
 			});
 		}
 	} catch (error) {
@@ -513,7 +510,7 @@ router.patch("/:id", async (req, res) => {
 		});
 });
 
-router.delete(":id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
 	// Not loggedin return 401
 	if (!req.isAuthenticated()) {
 		return res.status(401).send({
@@ -536,12 +533,9 @@ router.delete(":id", async (req, res) => {
 
 		// User not found
 		if (getResult.length < 1) {
-			return res.status(409).send({
+			return res.status(404).send({
 				success: false,
 				error: "not_found",
-				data: {
-					field: "email",
-				},
 			});
 		}
 
@@ -556,7 +550,7 @@ router.delete(":id", async (req, res) => {
 
 		return res.send({
 			success: true,
-			data: getResult[0],
+			data: toCamel(getResult[0]),
 		});
 	} catch (error) {
 		console.log(error);
