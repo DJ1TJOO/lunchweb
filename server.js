@@ -50,6 +50,7 @@ passport.use(
 	})
 );
 
+// Add middleware
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -64,9 +65,11 @@ app.use(
 	})
 );
 
+// Add passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Setup login and logout
 app.get("/logout", (req, res) => {
 	req.logout();
 	res.redirect("/login");
@@ -93,7 +96,7 @@ app.set("view engine", "handlebars");
 app.use("/api", require("./api/router"));
 
 app.get("/", function (req, res) {
-	if (!req.user) return res.redirect("/login");
+	if (!req.isAuthenticated()) return res.redirect("/login");
 	res.render("home", { title: "Home" });
 });
 
