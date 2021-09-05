@@ -288,7 +288,7 @@ router.patch("/:id", async (req, res) => {
 
 	const update = {};
 
-	if (firstName) {
+	if (typeof firstName !== "undefined") {
 		// Firstname too short
 		if (firstName.length < 5) {
 			return res.status(422).send({
@@ -316,7 +316,7 @@ router.patch("/:id", async (req, res) => {
 		update["first_name"] = firstName;
 	}
 
-	if (lastName) {
+	if (typeof lastName !== "undefined") {
 		// Lastname too short
 		if (lastName.length < 5) {
 			return res.status(422).send({
@@ -344,7 +344,7 @@ router.patch("/:id", async (req, res) => {
 		update["last_name"] = lastName;
 	}
 
-	if (email) {
+	if (typeof email !== "undefined") {
 		// Not an email
 		if (
 			!/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
@@ -398,7 +398,7 @@ router.patch("/:id", async (req, res) => {
 	}
 
 	// Check if leerlingNummer and if it is a number
-	if (leerlingNummer) {
+	if (typeof leerlingNummer !== "undefined") {
 		if (!Number.isInteger(leerlingNummer)) {
 			return res.status(422).send({
 				success: false,
@@ -413,7 +413,7 @@ router.patch("/:id", async (req, res) => {
 	}
 
 	// Check password
-	if (password) {
+	if (typeof password !== "undefined") {
 		// Password too long
 		if (password.length > 255) {
 			return res.status(422).send({
@@ -454,7 +454,7 @@ router.patch("/:id", async (req, res) => {
 		update["pwd"] = bcrypt.hashSync(password, 12);
 	}
 
-	if (vendor) {
+	if (typeof vendor !== "undefined") {
 		// Only vendors can add/remove other vendors
 		if (!req.user.vendor) {
 			return res.status(403).send({
@@ -467,47 +467,74 @@ router.patch("/:id", async (req, res) => {
 		update["vendor"] = !!vendor;
 	}
 
-	db.query(
-		`UPDATE users SET ${Object.keys(update)
-			.map((x) => `${x} = ?`)
-			.join(",")} WHERE id = ?`,
-		[...Object.values(update), req.params.id]
-	)
-		.then(([results]) => {
-			// Select user from db without pwd
-			db.query("SELECT id,first_name,last_name,email,leerling_nummer,vendor FROM users WHERE id = ?", [req.params.id])
-				.then(([results]) => {
-					if (results.length < 1) {
-						// No results
-						res.send({
-							success: true,
-							data: null,
-						});
-					} else {
-						// Send user as data
-						res.send({
-							success: true,
-							data: toCamel(results[0]),
-						});
-					}
-				})
-				.catch((error) => {
-					console.log(error);
-					// Mysql error
-					res.status(500).send({
-						success: false,
-						error: "mysql",
+	const updates = Object.keys(update);
+
+	// If no changes send user
+	if (updates.length < 1) {
+		// Select user from db without pwd
+		db.query("SELECT id,first_name,last_name,email,leerling_nummer,vendor FROM users WHERE id = ?", [req.params.id])
+			.then(([results]) => {
+				if (results.length < 1) {
+					// No results
+					res.send({
+						success: true,
+						data: null,
 					});
+				} else {
+					// Send user as data
+					res.send({
+						success: true,
+						data: toCamel(results[0]),
+					});
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				// Mysql error
+				res.status(500).send({
+					success: false,
+					error: "mysql",
 				});
-		})
-		.catch((error) => {
-			console.log(error);
-			// Mysql error
-			res.status(500).send({
-				success: false,
-				error: "mysql",
 			});
-		});
+	} else {
+		// Update user in db
+		db.query(`UPDATE users SET ${updates.map((x) => `${x} = ?`).join(",")} WHERE id = ?`, [...Object.values(update), req.params.id])
+			.then(([results]) => {
+				// Select user from db without pwd
+				db.query("SELECT id,first_name,last_name,email,leerling_nummer,vendor FROM users WHERE id = ?", [req.params.id])
+					.then(([results]) => {
+						if (results.length < 1) {
+							// No results
+							res.send({
+								success: true,
+								data: null,
+							});
+						} else {
+							// Send user as data
+							res.send({
+								success: true,
+								data: toCamel(results[0]),
+							});
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+						// Mysql error
+						res.status(500).send({
+							success: false,
+							error: "mysql",
+						});
+					});
+			})
+			.catch((error) => {
+				console.log(error);
+				// Mysql error
+				res.status(500).send({
+					success: false,
+					error: "mysql",
+				});
+			});
+	}
 });
 
 router.delete("/:id", async (req, res) => {
