@@ -208,7 +208,24 @@ router.post("/", async (req, res) => {
 	// Hash password
 	const pwd = bcrypt.hashSync(password, 12);
 
-	db.query("INSERT INTO users (first_name,last_name,email,leerling_nummer,pwd) VALUES (?,?,?,?,?)", [firstName, lastName, email, leerlingNummer, pwd])
+	let vendor = 0;
+	try {
+		const [getResult] = await db.query(`SELECT count(*) FROM users`);
+
+		// First user so vendor
+		if (getResult[0]["count(*)"] < 1) {
+			vendor = 1;
+		}
+	} catch (error) {
+		console.log(error);
+		// Mysql error
+		res.status(500).send({
+			success: false,
+			error: "mysql",
+		});
+	}
+
+	db.query("INSERT INTO users (first_name,last_name,email,leerling_nummer,pwd,vendor) VALUES (?,?,?,?,?,?)", [firstName, lastName, email, leerlingNummer, pwd, vendor])
 		.then(([results]) => {
 			// Select user from db without pwd
 			db.query("SELECT id,first_name,last_name,email,leerling_nummer,vendor FROM users WHERE email=?", [email])
