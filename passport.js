@@ -1,4 +1,8 @@
 const passport = require("passport");
+const { compareSync } = require("bcrypt");
+
+const db = require("./api/helpers/db");
+const { toCamel } = require("./api/helpers/utils");
 
 module.exports = (app) => {
 	// Give passport user id from user
