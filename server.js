@@ -2,6 +2,7 @@ const express = require("express");
 const expressHandlebars = require("express-handlebars");
 
 const middleware = require("./middleware");
+const passport = require("./passport");
 
 // Add env variables
 require("dotenv").config();
@@ -10,6 +11,9 @@ const app = express();
 
 // Add middleware
 middleware(app);
+
+// Add passport
+passport(app);
 
 // Setup handlebars view engine
 app.engine("handlebars", expressHandlebars());
