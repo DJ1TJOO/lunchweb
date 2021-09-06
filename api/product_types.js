@@ -10,6 +10,29 @@ const { toCamel } = require("./helpers/utils");
 const { Router } = require("express");
 const router = Router();
 
+/**
+ * @typedef {{
+ * 	name: String,
+ * 	options: [{
+ * 		name: String,
+ * 		type: Number,
+ * 		choices?: String[]
+ * 	}]
+ * }} ProductType
+ */
+
+/**
+ * @param {Array<{
+ * 	id: Number,
+ * 	name: String,
+ * 	option_id?: Number,
+ * 	option_name?: String,
+ * 	option_type?: Number,
+ * 	choice_id?: Number,
+ * 	choice_name?: String,
+ * }>} rows
+ * @returns {ProductType}
+ */
 const convertToTypeObject = (rows) => ({
 	id: rows[0].id,
 	name: rows[0].name,
@@ -157,6 +180,11 @@ router.post("/", (req, res) => {
 		});
 	}
 
+	/**
+	 * @type {ProductType}
+	 */
+	const { name, options } = req.body;
+
 	// TODO: post
 });
 
@@ -177,6 +205,10 @@ router.patch("/:id", async (req, res) => {
 		});
 	}
 
+	/**
+	 * @type {ProductType}
+	 */
+	const { name, options } = req.body;
 	// TODO: patch
 });
 
