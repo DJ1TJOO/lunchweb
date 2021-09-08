@@ -1,5 +1,8 @@
 const mysql = require("mysql2");
 
+// Add env variables
+require("dotenv").config();
+
 // Make connection to db and create pool
 const configuration = {
 	host: process.env.MYSQL_HOST,
@@ -8,6 +11,7 @@ const configuration = {
 	database: process.env.MYSQL_DB,
 	dateStrings: true,
 };
+
 module.exports = mysql.createPool(configuration).promise();
 
 module.exports.escape = mysql.escape;
