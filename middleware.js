@@ -1,6 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const uest = require("uest");
 
 module.exports = (app) => {
 	// Add cookie parser
@@ -21,4 +22,7 @@ module.exports = (app) => {
 			saveUninitialized: true,
 		})
 	);
+
+	// Add support for internal requests
+	app.use(uest());
 };

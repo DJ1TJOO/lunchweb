@@ -16,14 +16,29 @@ middleware(app);
 passport(app);
 
 // Setup handlebars view engine
-app.engine("handlebars", expressHandlebars());
+app.engine(
+	"handlebars",
+	expressHandlebars({
+		helpers: {
+			json: (content) => JSON.stringify(content),
+		},
+	})
+);
 app.set("view engine", "handlebars");
 
 app.use("/api", require("./api/router"));
 
 app.get("/", function (req, res) {
 	if (!req.isAuthenticated()) return res.redirect("/login");
-	res.render("home", { title: "Home" });
+	req.uest(
+		{
+			method: "GET",
+			url: "/api/products",
+		},
+		(_err, _res, data) => {
+			res.render("home", { title: "Home", products: data });
+		}
+	);
 });
 
 app.get("/login", function (req, res) {

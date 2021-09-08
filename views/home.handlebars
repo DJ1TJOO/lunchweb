@@ -1,1 +1,8 @@
 <h1>Home</h1>
+{{#each products.data}}
+	<div>
+		{{this.title}}
+		{{this.summary}}
+		{{this.price}}
+	</div>
+{{/each}}
