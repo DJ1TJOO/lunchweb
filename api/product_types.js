@@ -64,26 +64,13 @@ const convertToTypeObject = (rows) => ({
 });
 
 router.get("/", (req, res) => {
-	// Not loggedin return 401
-	if (!req.isAuthenticated()) {
-		return res.status(401).send({
-			success: false,
-			error: "unauthorized",
-		});
-	}
-
 	db.query(
 		`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_types_options as ptso
-                    ON pt.id = ptso.product_type
                 INNER JOIN product_type_options as pto
-                    ON ptso.product_type_option = pto.id
-                LEFT JOIN product_type_options_choices as ptoscs
-                    ON pto.id = ptoscs.product_type_option
+                    ON pt.id = pto.product_type_id
                 LEFT JOIN product_type_option_choices as ptoc
-                    ON ptoscs.product_type_option_choice = ptoc.id`,
-		[req.params.id]
+                    ON pto.id = ptoc.product_type_option_id`
 	)
 		.then(([results]) => {
 			if (results.length < 1) {
@@ -122,25 +109,13 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-	// Not loggedin return 401
-	if (!req.isAuthenticated()) {
-		return res.status(401).send({
-			success: false,
-			error: "unauthorized",
-		});
-	}
-
 	db.query(
 		`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_types_options as ptso
-                    ON pt.id = ptso.product_type
                 INNER JOIN product_type_options as pto
-                    ON ptso.product_type_option = pto.id
-                LEFT JOIN product_type_options_choices as ptoscs
-                    ON pto.id = ptoscs.product_type_option
+                    ON pt.id = pto.product_type_id
                 LEFT JOIN product_type_option_choices as ptoc
-                    ON ptoscs.product_type_option_choice = ptoc.id
+                    ON pto.id = ptoc.product_type_option_id
                 WHERE pt.id = ?`,
 		[req.params.id]
 	)
@@ -289,12 +264,10 @@ router.post("/", async (req, res) => {
 			for (let i = 0; i < options.length; i++) {
 				const option = options[i];
 				// Insert option
-				const [insertOptionResults] = await db.query("INSERT INTO product_type_options (name,type) VALUES (?,?)", [option.name, option.type]);
-
-				// Insert types options
-				const [insertTypesOptionsResults] = await db.query("INSERT INTO product_types_options (product_type, product_type_option) VALUES (?,?)", [
+				const [insertOptionResults] = await db.query("INSERT INTO product_type_options (name,type,product_type_id) VALUES (?,?,?)", [
+					option.name,
+					option.type,
 					insertResults.insertId,
-					insertOptionResults.insertId,
 				]);
 
 				// Insert choices
@@ -302,13 +275,10 @@ router.post("/", async (req, res) => {
 					for (let i = 0; i < option.choices.length; i++) {
 						const choice = option.choices[i];
 						// Insert choice
-						const [insertChoiceResults] = await db.query("INSERT INTO product_type_option_choices (name) VALUES (?)", [choice.name]);
-
-						// Insert type options choices
-						const [insertTypeOptionsChoicesResults] = await db.query(
-							"INSERT INTO product_type_options_choices (product_type_option, product_type_option_choice) VALUES (?,?)",
-							[insertOptionResults.insertId, insertChoiceResults.insertId]
-						);
+						const [insertChoiceResults] = await db.query("INSERT INTO product_type_option_choices (name, product_type_option_id) VALUES (?,?)", [
+							choice.name,
+							insertOptionResults.insertId,
+						]);
 					}
 				}
 			}
@@ -318,14 +288,10 @@ router.post("/", async (req, res) => {
 		db.query(
 			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_types_options as ptso
-                    ON pt.id = ptso.product_type
                 INNER JOIN product_type_options as pto
-                    ON ptso.product_type_option = pto.id
-                LEFT JOIN product_type_options_choices as ptoscs
-                    ON pto.id = ptoscs.product_type_option
+                    ON pt.id = pto.product_type_id
                 LEFT JOIN product_type_option_choices as ptoc
-                    ON ptoscs.product_type_option_choice = ptoc.id
+                    ON pto.id = ptoc.product_type_option_id
                 WHERE pt.id = ?`,
 			[insertResults.insertId]
 		)
@@ -370,7 +336,7 @@ router.patch("/:id", async (req, res) => {
 		});
 	}
 
-	// Only vendors can change types
+	// Only vendors can add types
 	if (!req.user.vendor) {
 		return res.status(403).send({
 			success: false,
@@ -379,11 +345,173 @@ router.patch("/:id", async (req, res) => {
 	}
 
 	/**
+	 * Destructure body
 	 * @type {ProductType}
 	 */
 	const { name, options } = req.body;
-	// TODO: patch
+
+	if (name) {
+		// Name too short
+		if (name.length < 3) {
+			return res.status(422).send({
+				success: false,
+				error: "too_short",
+				data: {
+					field: "name",
+					min: 3,
+				},
+			});
+		}
+
+		// Name too long
+		if (name.length > 255) {
+			return res.status(422).send({
+				success: false,
+				error: "too_long",
+				data: {
+					field: "name",
+					max: 255,
+				},
+			});
+		}
+
+		try {
+			const [nameResult] = await db.query(`SELECT count(*) FROM product_types WHERE name = ?`, [name]);
+
+			// Product type already exists
+			if (nameResult[0]["count(*)"] > 0) {
+				return res.status(409).send({
+					success: false,
+					error: "taken",
+					data: {
+						field: "name",
+					},
+				});
+			}
+		} catch (error) {
+			console.log(error);
+			// Mysql error
+			res.status(500).send({
+				success: false,
+				error: "mysql",
+			});
+		}
+	}
+
+	if (options) {
+		if (!Array.isArray(options)) {
+			return res.status(422).send({
+				success: false,
+				error: "invalid",
+				data: {
+					field: "options",
+				},
+			});
+		}
+
+		// Check if options are valid
+		if (
+			options.some(
+				(x) =>
+					// Check if all fields exists
+					!x.name ||
+					!x.type ||
+					// Check if fields are correct
+					typeof x.name !== "string" ||
+					typeof x.type !== "number" ||
+					!Object.values(PRODUCT_TYPE_OPTIONS).includes(x.type) ||
+					x.name.length < 3 ||
+					x.name.length > 255 ||
+					// Check types
+					((x.type === PRODUCT_TYPE_OPTIONS.chooseSelect || x.type === PRODUCT_TYPE_OPTIONS.select) && !x.choices) ||
+					// Check if choices are correct
+					(x.choices && x.choices.some((y) => typeof y.name !== "string" || y.name.length < 3 || y.name.length > 255))
+			)
+		) {
+			return res.status(422).send({
+				success: false,
+				error: "incorrect",
+				data: {
+					field: "options",
+				},
+			});
+		}
+	}
+	try {
+		if (name) {
+			// Update name product_type
+			const [updateResults] = await db.query("UPDATE product_types SET name=?", [name]);
+		}
+
+		// Insert options
+		if (options) {
+			for (let i = 0; i < options.length; i++) {
+				const option = options[i];
+				// Insert option
+				const [insertOptionResults] = await db.query("INSERT INTO product_type_options (name,type,product_type_id) VALUES (?,?,?)", [
+					option.name,
+					option.type,
+					insertResults.insertId,
+				]);
+
+				// Insert choices
+				if (option.choices) {
+					for (let i = 0; i < option.choices.length; i++) {
+						const choice = option.choices[i];
+						// Insert choice
+						const [insertChoiceResults] = await db.query("INSERT INTO product_type_option_choices (name, product_type_option_id) VALUES (?,?)", [
+							choice.name,
+							insertOptionResults.insertId,
+						]);
+					}
+				}
+			}
+		}
+
+		// Get inserted product type
+		db.query(
+			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
+                FROM product_types as pt
+                INNER JOIN product_type_options as pto
+                    ON pt.id = pto.product_type_id
+                LEFT JOIN product_type_option_choices as ptoc
+                    ON pto.id = ptoc.product_type_option_id
+                WHERE pt.id = ?`,
+			[insertResults.insertId]
+		)
+			.then(([results]) => {
+				if (results.length < 1) {
+					// No results thus not found
+					return res.status(404).send({
+						success: true,
+						data: null,
+					});
+				}
+
+				res.send({
+					success: true,
+					data: toCamel(convertToTypeObject(results)),
+				});
+			})
+			.catch((error) => {
+				console.log(error);
+				// Mysql error
+				res.status(500).send({
+					success: false,
+					error: "mysql",
+				});
+			});
+	} catch (error) {
+		console.log(error);
+		// Mysql error
+		res.status(500).send({
+			success: false,
+			error: "mysql",
+		});
+	}
 });
+
+// TODO: delete options
 
 router.delete("/:id", async (req, res) => {
 	// Not loggedin return 401
@@ -407,14 +535,10 @@ router.delete("/:id", async (req, res) => {
 		const [getResult] = await db.query(
 			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_types_options as ptso
-                    ON pt.id = ptso.product_type
                 INNER JOIN product_type_options as pto
-                    ON ptso.product_type_option = pto.id
-                LEFT JOIN product_type_options_choices as ptoscs
-                    ON pto.id = ptoscs.product_type_option
+                    ON pt.id = pto.product_type_id
                 LEFT JOIN product_type_option_choices as ptoc
-                    ON ptoscs.product_type_option_choice = ptoc.id
+                    ON pto.id = ptoc.product_type_option_id
                 WHERE pt.id = ?`,
 			[req.params.id]
 		);
@@ -428,15 +552,11 @@ router.delete("/:id", async (req, res) => {
 		}
 
 		const [deleteResults] = await db.query(
-			`DELETE pt,pto,ptoc,ptso,ptoscs FROM product_types as pt
-                INNER JOIN product_types_options as ptso
-                    ON pt.id = ptso.product_type
+			`DELETE pt,pto,ptoc FROM product_types as pt
                 INNER JOIN product_type_options as pto
-                    ON ptso.product_type_option = pto.id
-                LEFT JOIN product_type_options_choices as ptoscs
-                    ON pto.id = ptoscs.product_type_option
+                    ON pt.id = pto.product_type_id
                 LEFT JOIN product_type_option_choices as ptoc
-                    ON ptoscs.product_type_option_choice = ptoc.id
+                    ON pto.id = ptoc.product_type_option_id
                 WHERE pt.id = ?`,
 			[req.params.id]
 		);
