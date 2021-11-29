@@ -26,6 +26,7 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 
+app.use("/static", express.static("./public"));
 app.use("/api", require("./api/router"));
 
 app.get("/", function (req, res) {

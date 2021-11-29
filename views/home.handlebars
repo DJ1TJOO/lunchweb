@@ -1,8 +1,38 @@
-<h1>Home</h1>
-{{#each products.data}}
-	<div>
-		{{this.title}}
-		{{this.summary}}
-		{{this.price}}
+<script src="/static/shop.js" defer></script>
+
+<div class="devider"></div>
+<div class="container"><div class="title">Lunch</div></div>
+<div class="devider"></div>
+
+<div class="shop">
+	<div class="categories">
+		<div id="categorie-test" class="categorie container">name</div>
+		<div id="categorie-test1" class="categorie container">name</div>
+		<div id="categorie-test2" class="categorie container">name</div>
+		<div id="categorie-dranken" class="categorie container">Dranken</div>
 	</div>
-{{/each}}
+	<div></div>
+	<div class="container products">
+		<div class="categorie-pane" id="categorie-pane-test">
+
+			{{#each products.data}}
+				<div class="product">
+					{{this.title}}
+					{{this.summary}}
+					{{this.price}}
+				</div>
+			{{/each}}</div>
+		<div class="categorie-pane" id="categorie-pane-test1"></div>
+		<div class="categorie-pane" id="categorie-pane-test2"></div>
+		<div class="categorie-pane" id="categorie-pane-dranken">
+			{{#each products.data}}
+				<div class="product">
+					{{this.title}}
+					{{this.summary}}
+					{{this.price}}
+				</div>
+			{{/each}}
+		</div>
+	</div>
+	<div class="container cart"></div>
+</div>
