@@ -1,7 +1,7 @@
 <script src="/static/shop.js" defer></script>
 
 <div class="devider"></div>
-<div class="container"><div class="title">Lunch</div></div>
+<div class="container"><div class="header">Lunch</div></div>
 <div class="devider"></div>
 
 <div class="shop">
@@ -14,25 +14,55 @@
 	<div></div>
 	<div class="container products">
 		<div class="categorie-pane" id="categorie-pane-test">
-
 			{{#each products.data}}
 				<div class="product">
-					{{this.title}}
-					{{this.summary}}
-					{{this.price}}
-				</div>
-			{{/each}}</div>
-		<div class="categorie-pane" id="categorie-pane-test1"></div>
-		<div class="categorie-pane" id="categorie-pane-test2"></div>
-		<div class="categorie-pane" id="categorie-pane-dranken">
-			{{#each products.data}}
-				<div class="product">
-					{{this.title}}
-					{{this.summary}}
-					{{this.price}}
+					<div class="title">{{this.title}}</div>
+					<div class="summary">{{{this.summary}}}</div>
+					<div class="price">€{{this.price}}</div>
 				</div>
 			{{/each}}
 		</div>
+		<div class="categorie-pane" id="categorie-pane-test1"></div>
+		<div class="categorie-pane" id="categorie-pane-test2"></div>
+		<div class="categorie-pane" id="categorie-pane-dranken">
+		</div>
 	</div>
-	<div class="container cart"></div>
+	<div class="container cart">
+		<div class="header">Bestelling</div>
+		<div class="cart-items">
+			<div class="cart-item">
+				<div class="info">
+					<div class="title">Karnemelk</div>
+					<div class="price">€2,00</div>
+				</div>
+				<div class="options">
+					<select class="select">
+						<option value="0">Pistolet - wit</option>
+						<option value="1">Pistolet - bruin</option>
+					</select>
+					<label class="extra"><input type="checkbox" />Kaas</label>
+					<label class="extra"><input type="checkbox" />Tomaat</label>
+
+					<label class="extra"><input type="checkbox" />Ui</label>
+				</div>
+				<div class="extra">
+					<input type="text" class="note" placeholder="Opmerking" />
+					<div class="amount">
+						<div class="remove">-</div>
+						<div class="quantity">1</div>
+						<div class="add">+</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="total">
+			<div class="title">Totaal</div>
+			<div class="title price">€2,00</div>
+		</div>
+		<div class="date">
+			<input type="date" />
+		</div>
+		<div class="order">Bestellen</div>
+	</div>
 </div>

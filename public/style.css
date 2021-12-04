@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:ital,wght@0,300;0,700;1,300&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Open+Sans+Condensed:ital,wght@0,300;0,700;1,300&display=swap");
 * {
 	font-family: "Open Sans Condensed", sans-serif;
 	font-weight: 300;
@@ -61,7 +60,7 @@ body {
 	margin-bottom: 10px;
 }
 
-.container .title {
+.container .header {
 	width: fit-content;
 
 	margin: 0 auto;
@@ -88,7 +87,7 @@ body {
 .categorie {
 	display: inline-block;
 	position: relative;
-	width: fit-content;
+	width: 90px;
 	height: calc(40px - 20px);
 
 	margin-bottom: 0;
@@ -105,6 +104,7 @@ body {
 
 	cursor: pointer;
 
+	color: white;
 	background-color: rgba(255, 255, 255, 0.1);
 	transition: 0.3s background-color;
 }
@@ -162,6 +162,7 @@ body {
 .products {
 	border-radius: 0 25px 25px 25px;
 	border-top: none;
+	height: calc(100vh - 200px);
 }
 
 .product {
@@ -169,6 +170,209 @@ body {
 	background-color: #3413e1;
 	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
 
-	padding: 10px;
+	padding: 10px 20px;
 	color: white;
+
+	width: calc(50% - 60px);
+	min-height: 150px;
+
+	cursor: pointer;
+}
+
+.product .title {
+	font-size: 35px;
+	text-align: left;
+}
+.product .summary {
+	font-size: 20px;
+	text-align: left;
+}
+.product .price {
+	font-family: "Noto Sans", sans-serif;
+
+	font-size: 30px;
+	text-align: left;
+}
+
+.cart .cart-items::-webkit-scrollbar {
+	width: 0;
+}
+
+.cart .cart-items {
+	height: calc(100% - 290px);
+	overflow-y: scroll;
+	margin-bottom: 20px;
+	padding-top: 20px;
+}
+
+.cart .total {
+	display: flex;
+	justify-content: space-between;
+	border-radius: 30px;
+	background-color: #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 10px 20px;
+	color: white;
+
+	width: calc(100% - 40px);
+}
+
+.cart .total .title {
+	font-size: 30px;
+	text-align: left;
+}
+
+.cart .total .title .price {
+	text-align: right;
+}
+
+.cart .date {
+	display: flex;
+	justify-content: center;
+	border-radius: 30px;
+	background-color: transparent;
+	border: 3px solid #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	margin-top: 10px;
+	padding: 10px 20px;
+	color: #3413e1;
+
+	width: calc(100% - 46px);
+}
+
+.cart .date input {
+	outline: none;
+	background: transparent;
+	border: none;
+	color: #3413e1;
+	font-size: 24px;
+}
+
+.cart .order {
+	display: flex;
+	justify-content: center;
+	border-radius: 30px;
+	background-color: transparent;
+	border: 3px solid #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	margin-top: 10px;
+	padding: 5px 10px;
+	color: #3413e1;
+	font-size: 30px;
+
+	width: calc(100% - 26px);
+
+	cursor: pointer;
+}
+
+.cart-item {
+	border-radius: 17px;
+	background-color: #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 10px 10px;
+	color: white;
+
+	width: calc(100% - 20px);
+	min-height: 150px;
+}
+
+.cart-item .info {
+	display: flex;
+	justify-content: space-between;
+	padding: 0 10px;
+}
+
+.cart-item .info .title {
+	font-size: 35px;
+	text-align: left;
+}
+
+.cart-item .info .price {
+	font-size: 35px;
+	text-align: left;
+}
+
+.cart-item .options .select {
+	display: flex;
+	justify-content: center;
+	border-radius: 30px;
+	background-color: transparent;
+	border: 3px solid white;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	margin-top: 10px;
+	padding: 5px 10px;
+	color: white;
+	font-size: 20px;
+	text-align: center;
+
+	width: calc(100%);
+
+	cursor: pointer;
+	outline: none;
+}
+
+.cart-item .options .select option {
+	background-color: #3413e1;
+}
+
+.cart-item .options .extra {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-size: 20px;
+	margin: 5px 0px;
+	cursor: pointer;
+}
+
+.cart-item > .extra {
+	display: flex;
+	justify-content: space-between;
+}
+
+.cart-item > .extra .note {
+	background-color: transparent;
+	border: none;
+	outline: none;
+	color: white;
+	font-size: 20px;
+	width: 70%;
+}
+.cart-item > .extra .note::placeholder {
+	color: white;
+}
+.cart-item > .extra .note:focus::placeholder {
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.cart-item > .extra .amount {
+	display: flex;
+	flex-direction: row;
+	color: white;
+	font-size: 20px;
+}
+
+.cart-item > .extra .amount .add,
+.cart-item > .extra .amount .remove {
+	display: flex;
+	align-self: center;
+	justify-self: center;
+	align-items: center;
+	justify-content: center;
+
+	width: 20px;
+	height: 20px;
+	margin: 0 5px;
+
+	border-radius: 50px;
+
+	color: #3413e1;
+	background-color: white;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	cursor: pointer;
 }

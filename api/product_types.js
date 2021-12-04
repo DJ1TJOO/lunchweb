@@ -1,7 +1,6 @@
 const PRODUCT_TYPE_OPTIONS = {
 	extra: 0,
 	select: 1,
-	chooseSelect: 2,
 };
 
 const db = require("./helpers/db");
