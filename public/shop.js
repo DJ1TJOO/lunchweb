@@ -230,11 +230,11 @@ const date = document.getElementById("date");
 date.setAttribute("min", new Date().toISOString().split("T")[0]);
 
 // Check order and submit
-const order = document.getElementById("oder");
+const order = document.getElementById("order");
 order.addEventListener("click", () => {
 	const date = new Date(document.getElementById("date").value);
 	// Already gone date
-	if (date.getTime() < new Date()) {
+	if (!date || date.getTime() < Date.now()) {
 		// TODO: error message
 		return;
 	}
@@ -245,5 +245,19 @@ order.addEventListener("click", () => {
 		return;
 	}
 
-	// TODO: submit order
+	fetch("/api/orders", {
+		method: "POST",
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			deliver: date.getTime(),
+			products: cart,
+		}),
+	}).then(async (response) => {
+		// TODO: success message
+		console.log(response);
+		console.log(await response.json());
+	});
 });

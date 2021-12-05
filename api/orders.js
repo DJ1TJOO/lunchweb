@@ -21,6 +21,7 @@ router.get("/", () => {
 		});
 	}
 
+	// TODO: fix order_product_options
 	db.query(
 		`SELECT orders.id,
                 orders.user_id,
@@ -36,7 +37,7 @@ router.get("/", () => {
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
         LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id`
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id`
 	)
 		.then(([results]) => {
 			res.send({
@@ -54,7 +55,7 @@ router.get("/", () => {
 		});
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
 	// Not loggedin return 401
 	if (!req.isAuthenticated()) {
 		return res.status(401).send({
@@ -86,8 +87,8 @@ router.get("/:id", (req, res) => {
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
         LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
-		WHERE oders.id = ?`,
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+		WHERE orders.id = ?`,
 		[req.params.id]
 	)
 		.then(([results]) => {
@@ -141,12 +142,12 @@ router.post("/", async (req, res) => {
 		}
 
 		db.query(`INSERT INTO orders (user_id, status, deliver) VALUES (?,?,?)`, [req.user.id, 0, new Date(deliver)])
-			.then(([insertResults]) => {
+			.then(async ([insertResults]) => {
 				const orderId = insertResults.insertId;
 				try {
 					for (let i = 0; i < products.length; i++) {
 						const product = products[i];
-						const [insertResults] = await db.query(`INSERT INTO order_product (oder_id, product_id, quantity, note) VALUES (?,?,?,?)`, [
+						const [insertResults] = await db.query(`INSERT INTO order_product (order_id, product_id, quantity, note) VALUES (?,?,?,?)`, [
 							orderId,
 							product.id,
 							product.quantity,
@@ -155,7 +156,7 @@ router.post("/", async (req, res) => {
 
 						for (let i = 0; i < product.typeValue.length; i++) {
 							const option = product.typeValue[i];
-							db.query(`INSERT INTO order_product_options (oder_product_id, name, type, value) VALUES (?,?,?,?)`, [
+							db.query(`INSERT INTO order_product_options (order_product_id, name, type, value) VALUES (?,?,?,?)`, [
 								insertResults.insertId,
 								option.name,
 								option.type,
@@ -179,7 +180,7 @@ router.post("/", async (req, res) => {
 							products.type FROM orders
 					LEFT JOIN order_product ON orders.id = order_product.order_id
 					LEFT JOIN products ON order_product.product_id = products.id
-        			LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
+        			LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 					WHERE orders.id = ?`,
 						[orderId]
 					)
@@ -217,7 +218,7 @@ router.post("/", async (req, res) => {
 	});
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
 	// Not loggedin return 401
 	if (!req.isAuthenticated()) {
 		return res.status(401).send({
@@ -249,11 +250,11 @@ router.delete("/:id", (req, res) => {
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
         LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
-		WHERE oders.id = ?`,
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+		WHERE orders.id = ?`,
 		[req.params.id]
 	)
-		.then(([results]) => {
+		.then(async ([results]) => {
 			// Order not found
 			if (results.length < 1) {
 				return res.status(404).send({
@@ -262,7 +263,7 @@ router.delete("/:id", (req, res) => {
 				});
 			}
 
-			// Delete order and oder_products
+			// Delete order and order_products
 			const [deleteResults] = await db.query(
 				`DELETE orders.id,
 					orders.user_id,
@@ -278,8 +279,8 @@ router.delete("/:id", (req, res) => {
 					products.type FROM orders
 			LEFT JOIN order_product ON orders.id = order_product.order_id
 			LEFT JOIN products ON order_product.product_id = products.id
-        	LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
-			WHERE oders.id = ?`,
+        	LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+			WHERE orders.id = ?`,
 				[req.params.id]
 			);
 
