@@ -35,7 +35,8 @@ router.get("/", () => {
                 products.price,
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
-        LEFT JOIN products ON order_product.product_id = products.id`
+        LEFT JOIN products ON order_product.product_id = products.id
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id`
 	)
 		.then(([results]) => {
 			res.send({
@@ -85,6 +86,7 @@ router.get("/:id", (req, res) => {
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
         LEFT JOIN products ON order_product.product_id = products.id
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
 		WHERE oders.id = ?`,
 		[req.params.id]
 	)
@@ -144,7 +146,22 @@ router.post("/", async (req, res) => {
 				try {
 					for (let i = 0; i < products.length; i++) {
 						const product = products[i];
-						db.query(`INSERT INTO order_product (oder_id, product_id, quantity, note) VALUES (?,?,?,?)`, [orderId, product.id, product.quantity, product.note]);
+						const [insertResults] = await db.query(`INSERT INTO order_product (oder_id, product_id, quantity, note) VALUES (?,?,?,?)`, [
+							orderId,
+							product.id,
+							product.quantity,
+							product.note,
+						]);
+
+						for (let i = 0; i < product.typeValue.length; i++) {
+							const option = product.typeValue[i];
+							db.query(`INSERT INTO order_product_options (oder_product_id, name, type, value) VALUES (?,?,?,?)`, [
+								insertResults.insertId,
+								option.name,
+								option.type,
+								option.value,
+							]);
+						}
 					}
 
 					db.query(
@@ -162,6 +179,7 @@ router.post("/", async (req, res) => {
 							products.type FROM orders
 					LEFT JOIN order_product ON orders.id = order_product.order_id
 					LEFT JOIN products ON order_product.product_id = products.id
+        			LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
 					WHERE orders.id = ?`,
 						[orderId]
 					)
@@ -231,6 +249,7 @@ router.delete("/:id", (req, res) => {
                 products.type FROM orders
         LEFT JOIN order_product ON orders.id = order_product.order_id
         LEFT JOIN products ON order_product.product_id = products.id
+        LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
 		WHERE oders.id = ?`,
 		[req.params.id]
 	)
@@ -259,6 +278,7 @@ router.delete("/:id", (req, res) => {
 					products.type FROM orders
 			LEFT JOIN order_product ON orders.id = order_product.order_id
 			LEFT JOIN products ON order_product.product_id = products.id
+        	LEFT JOIN order_product_options ON order_product.id = order_product_options.oder_product_id
 			WHERE oders.id = ?`,
 				[req.params.id]
 			);

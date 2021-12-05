@@ -166,7 +166,7 @@ const addToCart = (product) => {
 				for (let i = 0; i < option.choices.length; i++) {
 					const choice = option.choices[i];
 					const selectOption = document.createElement("option");
-					selectOption.value = i;
+					selectOption.value = choice.id;
 					selectOption.innerText = choice.name;
 					select.appendChild(selectOption);
 				}
