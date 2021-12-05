@@ -36,6 +36,7 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 
+// Add routes
 app.use("/static", express.static("./public"));
 app.use("/api", require("./api/router"));
 

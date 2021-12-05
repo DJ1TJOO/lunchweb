@@ -1,3 +1,4 @@
+// Do categorie switching
 const categories = [...document.getElementsByClassName("categorie")];
 const categoriePanes = [...document.getElementsByClassName("categorie-pane")];
 
@@ -18,6 +19,7 @@ for (let i = 0; i < categories.length; i++) {
 	});
 }
 
+// Format price
 const formatPrice = (price) =>
 	Number(price).toLocaleString("nl-NL", {
 		style: "currency",
@@ -26,6 +28,7 @@ const formatPrice = (price) =>
 
 const productTypes = JSON.parse(document.getElementById("shop-script").getAttribute("data-product-types"));
 
+// Create observer for cart to update total price
 const cart = ObservableSlim.create([], true, (changes) => {
 	for (let i = 0; i < changes.length; i++) {
 		const change = changes[i];
@@ -38,6 +41,7 @@ const cart = ObservableSlim.create([], true, (changes) => {
 	}
 });
 
+// Update total price tag
 const updateTotal = () => {
 	let total = 0;
 	for (let i = 0; i < cart.length; i++) {
@@ -45,12 +49,16 @@ const updateTotal = () => {
 	}
 	const price = document.getElementById("total");
 	price.innerText = formatPrice(total);
+	return total;
 };
 
 const cartItems = document.getElementById("cart-items");
 
+// Generate html for product
 const addToCart = (product) => {
 	const type = productTypes.find((type) => type.id === product.typeId);
+
+	// Only generate new html if not existing
 	for (let i = 0; i < cart.length; i++) {
 		const cartItemData = cart[i];
 		if (type) {
@@ -84,6 +92,7 @@ const addToCart = (product) => {
 		}
 	}
 
+	// Create data for cart
 	const cartItemData = product;
 	do {
 		cartItemData.cartId = Math.floor(Math.random() * 100) + 1;
@@ -95,6 +104,7 @@ const addToCart = (product) => {
 	}
 	cart.push(cartItemData);
 
+	// Create html elements
 	const cartItem = document.createElement("div");
 	cartItem.classList.add("cart-item");
 	cartItem.setAttribute("data-id", product.id);
@@ -214,3 +224,26 @@ const addToCart = (product) => {
 
 	cartItems.appendChild(cartItem);
 };
+
+// Set min date for order
+const date = document.getElementById("date");
+date.setAttribute("min", new Date().toISOString().split("T")[0]);
+
+// Check order and submit
+const order = document.getElementById("oder");
+order.addEventListener("click", () => {
+	const date = new Date(document.getElementById("date").value);
+	// Already gone date
+	if (date.getTime() < new Date()) {
+		// TODO: error message
+		return;
+	}
+
+	// No items
+	if (cart.length < 1) {
+		// TODO: error message
+		return;
+	}
+
+	// TODO: submit order
+});
