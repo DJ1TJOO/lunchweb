@@ -64,22 +64,14 @@ const convertToTypeObject = (rows) => ({
 
 router.get("/", (req, res) => {
 	db.query(
-		`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
+		`SELECT pt.id, pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type, ptoc.id AS choice_id, ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id`
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id`
 	)
 		.then(([results]) => {
-			if (results.length < 1) {
-				// No results thus not found
-				return res.status(404).send({
-					success: false,
-					error: "not_found",
-				});
-			}
-
 			const typeRows = {};
 			for (let i = 0; i < results.length; i++) {
 				const result = results[i];

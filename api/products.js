@@ -1,10 +1,3 @@
-// const PRODUCT_TYPES = {
-// 	drinks: "drinks",
-// 	salads: "salads",
-// 	wraps: "wraps",
-// 	sandwiches: "sandwiches",
-// 	soups: "soups",
-// };
 const db = require("./helpers/db");
 const { checkEmpty, toCamel, objectToResponse } = require("./helpers/utils");
 

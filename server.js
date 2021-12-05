@@ -21,6 +21,16 @@ app.engine(
 	expressHandlebars({
 		helpers: {
 			json: (content) => JSON.stringify(content),
+			capitalizeFirstLetter: (content) => content.charAt(0).toUpperCase() + content.slice(1),
+			formatPrice: (price) =>
+				Number(price)
+					.toLocaleString("en-US", {
+						style: "currency",
+						currency: "EUR",
+					})
+					.replace(".", "dot")
+					.replace(",", ".")
+					.replace("dot", ","),
 		},
 	})
 );
@@ -36,9 +46,23 @@ app.get("/", function (req, res) {
 			method: "GET",
 			url: "/api/products",
 		},
-		(_err, _res, data) => {
-			res.render("home", { title: "Home", products: data });
-		}
+		(_err, _res, productData) =>
+			req.uest(
+				{
+					method: "GET",
+					url: "/api/product-types",
+				},
+				(_err, _res, productTypes) => {
+					const types = [...new Set(productTypes.data.map((productType) => productType.name))];
+					const products = {};
+					for (let i = 0; i < types.length; i++) {
+						const type = types[i];
+						products[type] = productData.data.filter((product) => product.type === type);
+					}
+
+					res.render("home", { title: "Home", products: products, categories: types, productTypes: productTypes.data });
+				}
+			)
 	);
 });
 

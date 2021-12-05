@@ -1,4 +1,5 @@
-<script src="/static/shop.js" defer></script>
+<script src="/static/observable-slim.min.js"></script>
+<script src="/static/shop.js" id="shop-script" data-product-types='{{{json productTypes}}}' defer></script>
 
 <div class="devider"></div>
 <div class="container"><div class="header">Lunch</div></div>
@@ -6,59 +7,31 @@
 
 <div class="shop">
 	<div class="categories">
-		<div id="categorie-test" class="categorie container">name</div>
-		<div id="categorie-test1" class="categorie container">name</div>
-		<div id="categorie-test2" class="categorie container">name</div>
-		<div id="categorie-dranken" class="categorie container">Dranken</div>
+		{{#each categories}}
+			<div id="categorie-{{this}}" class="categorie container">{{capitalizeFirstLetter this}}</div>
+		{{/each}}
 	</div>
 	<div></div>
 	<div class="container products">
-		<div class="categorie-pane" id="categorie-pane-test">
-			{{#each products.data}}
-				<div class="product">
-					<div class="title">{{this.title}}</div>
-					<div class="summary">{{{this.summary}}}</div>
-					<div class="price">€{{this.price}}</div>
-				</div>
-			{{/each}}
-		</div>
-		<div class="categorie-pane" id="categorie-pane-test1"></div>
-		<div class="categorie-pane" id="categorie-pane-test2"></div>
-		<div class="categorie-pane" id="categorie-pane-dranken">
-		</div>
+		{{#each categories}}
+			<div class="categorie-pane" id="categorie-pane-{{this}}">
+				{{#each (lookup ../products this)}}
+					<div class="product" onclick='addToCart(JSON.parse(`{{{json this}}}`))'>
+						<div class="title">{{this.title}}</div>
+						<div class="summary">{{{this.summary}}}</div>
+						<div class="price">{{formatPrice this.price}}</div>
+					</div>
+				{{/each}}
+			</div>
+		{{/each}}
 	</div>
 	<div class="container cart">
 		<div class="header">Bestelling</div>
-		<div class="cart-items">
-			<div class="cart-item">
-				<div class="info">
-					<div class="title">Karnemelk</div>
-					<div class="price">€2,00</div>
-				</div>
-				<div class="options">
-					<select class="select">
-						<option value="0">Pistolet - wit</option>
-						<option value="1">Pistolet - bruin</option>
-					</select>
-					<label class="extra"><input type="checkbox" />Kaas</label>
-					<label class="extra"><input type="checkbox" />Tomaat</label>
-
-					<label class="extra"><input type="checkbox" />Ui</label>
-				</div>
-				<div class="extra">
-					<input type="text" class="note" placeholder="Opmerking" />
-					<div class="amount">
-						<div class="remove">-</div>
-						<div class="quantity">1</div>
-						<div class="add">+</div>
-					</div>
-				</div>
-
-			</div>
+		<div  id="cart-items" class="cart-items">
 		</div>
 		<div class="total">
 			<div class="title">Totaal</div>
-			<div class="title price">€2,00</div>
+			<div class="title price" id="total">{{formatPrice 2}}</div>
 		</div>
 		<div class="date">
 			<input type="date" />
