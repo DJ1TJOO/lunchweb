@@ -103,10 +103,10 @@ router.get("/:id", (req, res) => {
 	db.query(
 		`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
 		[req.params.id]
 	)
@@ -279,10 +279,10 @@ router.post("/", async (req, res) => {
 		db.query(
 			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
 			[insertResults.insertId]
 		)
@@ -463,10 +463,10 @@ router.patch("/:id", async (req, res) => {
 		db.query(
 			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
 			[insertResults.insertId]
 		)
@@ -502,8 +502,6 @@ router.patch("/:id", async (req, res) => {
 	}
 });
 
-// TODO: delete options
-
 router.delete("/:id", async (req, res) => {
 	// Not loggedin return 401
 	if (!req.isAuthenticated()) {
@@ -526,10 +524,10 @@ router.delete("/:id", async (req, res) => {
 		const [getResult] = await db.query(
 			`SELECT pt.id,pt.name, pto.id AS option_id, pto.name AS option_name, pto.type AS option_type,ptoc.id AS choice_id,ptoc.name AS choice_name
                 FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
 			[req.params.id]
 		);
@@ -544,10 +542,10 @@ router.delete("/:id", async (req, res) => {
 
 		const [deleteResults] = await db.query(
 			`DELETE pt,pto,ptoc FROM product_types as pt
-                INNER JOIN product_type_options as pto
-                    ON pt.id = pto.product_type_id
-                LEFT JOIN product_type_option_choices as ptoc
-                    ON pto.id = ptoc.product_type_option_id
+                LEFT OUTER JOIN product_type_options as pto
+                    ON pto.product_type_id = pt.id
+                LEFT OUTER JOIN product_type_option_choices as ptoc
+                    ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
 			[req.params.id]
 		);
