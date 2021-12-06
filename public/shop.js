@@ -160,7 +160,7 @@ const addToCart = (product) => {
 					const value = Number(document.getElementById(cartItemData.cartId + " " + type.id + " " + i).value);
 					cartItemData.typeValue.options[i].value = value;
 				});
-				cartItemData.typeValue.options[i].value = 0;
+				cartItemData.typeValue.options[i].value = option.choices[0].id;
 				selectDiv.appendChild(select);
 
 				for (let i = 0; i < option.choices.length; i++) {

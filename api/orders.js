@@ -1,8 +1,50 @@
 const db = require("./helpers/db");
-const { checkEmpty, toCamel, objectToResponse } = require("./helpers/utils");
+const { toCamel } = require("./helpers/utils");
 
 const { Router } = require("express");
+const { PRODUCT_TYPE_OPTIONS } = require("./product_types");
 const router = Router();
+
+const convertToOrderObject = (rows) => ({
+	id: rows[0].id,
+	user_id: rows[0].user_id,
+	status: rows[0].status,
+	deliver: rows[0].deliver,
+	products: rows
+		.filter((x, i) => !!x.order_product_id && rows.findIndex((y) => y.order_product_id === x.order_product_id) === i)
+		.map((orderProduct) => {
+			return {
+				id: orderProduct.product_id,
+				title: orderProduct.title,
+				summary: orderProduct.summary,
+				price: orderProduct.price,
+				type: orderProduct.type,
+				note: orderProduct.note,
+				quantity: orderProduct.quantity,
+				order_product_id: orderProduct.order_product_id,
+				options: rows
+					.filter((x) => x.order_product_id === orderProduct.order_product_id)
+					.map((orderProduct) => {
+						if (orderProduct.order_product_option_type === PRODUCT_TYPE_OPTIONS.extra) {
+							return {
+								id: orderProduct.order_product_option_id,
+								name: orderProduct.order_product_option_name,
+								type: orderProduct.order_product_option_type,
+								value: Boolean(orderProduct.order_product_option_value),
+							};
+						} else if (orderProduct.order_product_option_type === PRODUCT_TYPE_OPTIONS.select) {
+							return {
+								id: orderProduct.order_product_option_id,
+								name: orderProduct.order_product_option_name,
+								type: orderProduct.order_product_option_type,
+								value: orderProduct.product_type_option_choices_name,
+								value_id: orderProduct.order_product_option_value,
+							};
+						}
+					}),
+			};
+		}),
+});
 
 router.get("/", () => {
 	// Not loggedin return 401
@@ -21,7 +63,6 @@ router.get("/", () => {
 		});
 	}
 
-	// TODO: fix order_product_options
 	db.query(
 		`SELECT orders.id,
                 orders.user_id,
@@ -34,10 +75,18 @@ router.get("/", () => {
                 products.title,
                 products.summary,
                 products.price,
-                products.type FROM orders
-        LEFT JOIN order_product ON orders.id = order_product.order_id
-        LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id`
+				product_types.name AS type,
+				product_types.id AS type_id,
+				order_product_options.id AS order_product_option_id,
+				order_product_options.name AS order_product_option_name,
+				order_product_options.type AS order_product_option_type,
+				order_product_options.value AS order_product_option_value,
+				product_type_option_choices.name AS product_type_option_choices_name FROM orders
+        LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+        LEFT OUTER JOIN products ON order_product.product_id = products.id
+        LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+		LEFT OUTER JOIN product_types ON products.type = product_types.id
+        LEFT OUTER JOIN product_type_option_choices ON order_product_options.value = product_type_option_choices.id`
 	)
 		.then(([results]) => {
 			res.send({
@@ -57,20 +106,20 @@ router.get("/", () => {
 
 router.get("/:id", async (req, res) => {
 	// Not loggedin return 401
-	if (!req.isAuthenticated()) {
-		return res.status(401).send({
-			success: false,
-			error: "unauthorized",
-		});
-	}
+	// if (!req.isAuthenticated()) {
+	// 	return res.status(401).send({
+	// 		success: false,
+	// 		error: "unauthorized",
+	// 	});
+	// }
 
-	// Only vendors can access orders
-	if (!req.user.vendor) {
-		return res.status(403).send({
-			success: false,
-			error: "forbidden",
-		});
-	}
+	// // Only vendors can access orders
+	// if (!req.user.vendor) {
+	// 	return res.status(403).send({
+	// 		success: false,
+	// 		error: "forbidden",
+	// 	});
+	// }
 
 	db.query(
 		`SELECT orders.id,
@@ -84,17 +133,34 @@ router.get("/:id", async (req, res) => {
                 products.title,
                 products.summary,
                 products.price,
-                products.type FROM orders
-        LEFT JOIN order_product ON orders.id = order_product.order_id
-        LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+				product_types.name AS type,
+				product_types.id AS type_id,
+				order_product_options.id AS order_product_option_id,
+				order_product_options.name AS order_product_option_name,
+				order_product_options.type AS order_product_option_type,
+				order_product_options.value AS order_product_option_value,
+				product_type_option_choices.name AS product_type_option_choices_name FROM orders
+        LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+        LEFT OUTER JOIN products ON order_product.product_id = products.id
+        LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+		LEFT OUTER JOIN product_types ON products.type = product_types.id
+        LEFT OUTER JOIN product_type_option_choices ON order_product_options.value = product_type_option_choices.id
 		WHERE orders.id = ?`,
 		[req.params.id]
 	)
 		.then(([results]) => {
+			console.log(JSON.stringify(results));
+			// Order not found
+			if (results.length < 1) {
+				return res.status(404).send({
+					success: false,
+					error: "not_found",
+				});
+			}
+
 			res.send({
 				success: true,
-				data: toCamel(results),
+				data: toCamel(convertToOrderObject(results)),
 			});
 		})
 		.catch((error) => {
@@ -154,8 +220,8 @@ router.post("/", async (req, res) => {
 							product.note,
 						]);
 
-						for (let i = 0; i < product.typeValue.length; i++) {
-							const option = product.typeValue[i];
+						for (let i = 0; i < product.typeValue.options.length; i++) {
+							const option = product.typeValue.options[i];
 							db.query(`INSERT INTO order_product_options (order_product_id, name, type, value) VALUES (?,?,?,?)`, [
 								insertResults.insertId,
 								option.name,
@@ -177,10 +243,18 @@ router.post("/", async (req, res) => {
 							products.title,
 							products.summary,
 							products.price,
-							products.type FROM orders
-					LEFT JOIN order_product ON orders.id = order_product.order_id
-					LEFT JOIN products ON order_product.product_id = products.id
-        			LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+							product_types.name AS type,
+							product_types.id AS type_id,
+							order_product_options.id AS order_product_option_id,
+							order_product_options.name AS order_product_option_name,
+							order_product_options.type AS order_product_option_type,
+							order_product_options.value AS order_product_option_value,
+							product_type_option_choices.name AS product_type_option_choices_name FROM orders
+					LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+					LEFT OUTER JOIN products ON order_product.product_id = products.id
+					LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+					LEFT OUTER JOIN product_types ON products.type = product_types.id
+					LEFT OUTER JOIN product_type_option_choices ON order_product_options.value = product_type_option_choices.id
 					WHERE orders.id = ?`,
 						[orderId]
 					)
@@ -247,10 +321,18 @@ router.delete("/:id", async (req, res) => {
                 products.title,
                 products.summary,
                 products.price,
-                products.type FROM orders
-        LEFT JOIN order_product ON orders.id = order_product.order_id
-        LEFT JOIN products ON order_product.product_id = products.id
-        LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+				product_types.name AS type,
+				product_types.id AS type_id,
+				order_product_options.id AS order_product_option_id,
+				order_product_options.name AS order_product_option_name,
+				order_product_options.type AS order_product_option_type,
+				order_product_options.value AS order_product_option_value,
+				product_type_option_choices.name AS product_type_option_choices_name FROM orders
+        LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+        LEFT OUTER JOIN products ON order_product.product_id = products.id
+        LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+		LEFT OUTER JOIN product_types ON products.type = product_types.id
+        LEFT OUTER JOIN product_type_option_choices ON order_product_options.value = product_type_option_choices.id
 		WHERE orders.id = ?`,
 		[req.params.id]
 	)
@@ -276,10 +358,14 @@ router.delete("/:id", async (req, res) => {
 					products.title,
 					products.summary,
 					products.price,
-					products.type FROM orders
-			LEFT JOIN order_product ON orders.id = order_product.order_id
-			LEFT JOIN products ON order_product.product_id = products.id
-        	LEFT JOIN order_product_options ON order_product.id = order_product_options.order_product_id
+					products.type,
+					order_product_options.id AS order_product_option_id,
+					order_product_options.name AS order_product_option_name,
+					order_product_options.type AS order_product_option_type,
+					order_product_options.value AS order_product_option_value FROM orders
+			LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+			LEFT OUTER JOIN products ON order_product.product_id = products.id
+        	LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 			WHERE orders.id = ?`,
 				[req.params.id]
 			);

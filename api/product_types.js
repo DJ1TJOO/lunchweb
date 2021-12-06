@@ -1,4 +1,4 @@
-const PRODUCT_TYPE_OPTIONS = {
+PRODUCT_TYPE_OPTIONS = {
 	extra: 0,
 	select: 1,
 };
@@ -570,5 +570,7 @@ router.delete("/:id", async (req, res) => {
 		});
 	}
 });
+
+router.PRODUCT_TYPE_OPTIONS = PRODUCT_TYPE_OPTIONS;
 
 module.exports = router;

@@ -483,7 +483,10 @@ router.delete("/:id", async (req, res) => {
 
 	// Check if product exists
 	try {
-		const [getResult] = await db.query(`SELECT id,title,summary,price,type AS type_id FROM products WHERE id = ?`, [req.params.id]);
+		const [getResult] = await db.query(
+			`SELECT products.id,products.title,products.summary,products.price,product_types.name AS type,product_types.id AS type_id FROM products LEFT JOIN product_types ON products.type = product_types.id WHERE products.type = ?`,
+			[req.params.id]
+		);
 
 		// Product not found
 		if (getResult.length < 1) {
