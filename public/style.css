@@ -422,6 +422,90 @@ body {
 	cursor: pointer;
 }
 
+.message-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(100%);
+	height: calc(100%);
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(5px);
+	z-index: 1000;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.message {
+	box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.1);
+
+	backdrop-filter: blur(50px) brightness(102%) opacity(20%);
+	background-color: rgba(255, 255, 255, 0.15);
+
+	border-left: rgba(255, 255, 255, 0.15) 1px solid;
+	border-top: rgba(255, 255, 255, 0.15) 1px solid;
+	border-radius: 25px;
+
+	padding: 20px;
+	margin-bottom: 10px;
+
+	color: white;
+	font-size: 20px;
+	text-align: center;
+
+	position: relative;
+	pointer-events: all;
+}
+
+.message .close {
+	position: absolute;
+	right: 50%;
+	transform: translateX(50%);
+	top: -45px;
+
+	font-size: 20px;
+	color: white;
+
+	box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.1);
+
+	backdrop-filter: blur(50px) brightness(102%) opacity(20%);
+	background-color: rgba(255, 255, 255, 0.15);
+
+	border-left: rgba(255, 255, 255, 0.15) 1px solid;
+	border-top: rgba(255, 255, 255, 0.15) 1px solid;
+	border-radius: 25px;
+
+	width: 25px;
+	height: 25px;
+
+	pointer-events: all;
+
+	padding: 5px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.message-error {
+	color: rgb(170, 0, 0);
+	font-weight: 700;
+}
+
+.message-btn {
+	background-color: #2273f8;
+	border-radius: 17px;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+.message-btn-error {
+	background-color: rgb(170, 0, 0);
+}
+
 /** LOGIN **/
 .login {
 	max-width: 300px;

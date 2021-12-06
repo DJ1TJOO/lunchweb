@@ -229,36 +229,106 @@ const addToCart = (product) => {
 const date = document.getElementById("date");
 date.setAttribute("min", new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
 
+const createErrorMessage = (error) => {
+	const container = document.getElementById("shop-message-container");
+
+	const messageContainer = document.createElement("div");
+	messageContainer.id = "message-" + Math.floor(Math.random() * 100) + 1;
+	messageContainer.classList.add("message-container");
+
+	const message = document.createElement("div");
+	message.classList.add("message", "message-error");
+
+	const close = document.createElement("div");
+	close.classList.add("close");
+	close.innerHTML = "&#10006;";
+	close.setAttribute("onclick", `document.getElementById('${messageContainer.id}').remove()`);
+
+	message.appendChild(close);
+	message.innerHTML += error;
+
+	messageContainer.appendChild(message);
+	container.appendChild(messageContainer);
+};
+
+const createConfirgMessage = (confirm, cbConfirm, cbReject) => {
+	const container = document.getElementById("shop-message-container");
+
+	const messageContainer = document.createElement("div");
+	messageContainer.id = "message-" + Math.floor(Math.random() * 100) + 1;
+	messageContainer.classList.add("message-container");
+
+	const message = document.createElement("div");
+	message.classList.add("message");
+
+	const close = document.createElement("div");
+	close.classList.add("close");
+	close.innerHTML = "&#10006;";
+	close.setAttribute("onclick", `document.getElementById('${messageContainer.id}').remove(); `);
+
+	message.appendChild(close);
+	message.innerHTML += confirm;
+
+	const conf = document.createElement("div");
+	conf.classList.add("message-btn");
+	conf.innerHTML = "Ja";
+	conf.addEventListener("click", () => {
+		messageContainer.remove();
+		cbConfirm();
+	});
+	message.appendChild(conf);
+
+	const reject = document.createElement("div");
+	reject.classList.add("message-btn", "message-btn-error");
+	reject.innerHTML = "Annuleer";
+	reject.addEventListener("click", () => {
+		messageContainer.remove();
+		cbReject();
+	});
+	message.appendChild(reject);
+
+	messageContainer.appendChild(message);
+	container.appendChild(messageContainer);
+};
+
 // Check order and submit
 const order = document.getElementById("order");
 order.addEventListener("click", () => {
 	const date = new Date(document.getElementById("date").value);
 	// Already gone date
 	if (!date || date.getTime() < new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).getTime()) {
-		// TODO: error message
+		createErrorMessage("Kies een datum minimaal 3 dagen vooruit.");
 		return;
 	}
 
 	// No items
 	if (cart.length < 1) {
-		// TODO: error message
+		createErrorMessage("Er zijn geen items in uw bestelling.");
 		return;
 	}
 
-	// TODO: confirm
-	fetch("/api/orders", {
-		method: "POST",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			deliver: date.getTime(),
-			products: cart,
-		}),
-	}).then(async (response) => {
-		// TODO: success message
-		console.log(response);
-		console.log(await response.json());
-	});
+	createConfirgMessage(
+		"Weet u zeker dat u wilt bestellen?",
+		() =>
+			fetch("/api/orders", {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					deliver: date.getTime(),
+					products: cart,
+				}),
+			})
+				.then(async (response) => {
+					// TODO: success message
+					console.log(response);
+					console.log(await response.json());
+				})
+				.catch(() => {
+					createErrorMessage("Er was een fout tijdens het bestellen. <br>Probeer het opnieuw.");
+				}),
+		() => {}
+	);
 });
