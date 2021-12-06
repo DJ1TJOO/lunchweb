@@ -157,7 +157,7 @@ router.post("/", async (req, res) => {
 
 	// Check if leerlingNummer and if it is a number
 	if (leerlingNummer) {
-		if (!Number.isInteger(leerlingNummer)) {
+		if (isNaN(leerlingNummer)) {
 			return res.status(422).send({
 				success: false,
 				error: "invalid",
@@ -198,7 +198,7 @@ router.post("/", async (req, res) => {
 	if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_-])(?=.{8,})/.test(password)) {
 		return res.status(422).send({
 			success: false,
-			error: "incorrect",
+			error: "invalid",
 			data: {
 				field: "password",
 			},

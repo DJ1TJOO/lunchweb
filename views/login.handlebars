@@ -5,14 +5,17 @@
 
 	<div class="container">
 		<div class="header title">Login</div>
+		{{#if message}}
+			<div class="message">{{message}}</div>
+		{{/if}}
 		<div class="email">
-			<input type="text" name="username" placeholder="Email" />
+			<input type="email" name="username" placeholder="Email" />
 		</div>
 		<div class="password">
 			<input type="password" name="password" placeholder="Wachtwoord" />
 		</div>
 		<div class="login-btn">
-			<input type="submit" value="Log In" />
+			<input type="submit" value="Login" />
 		</div>
 		<div class="register-btn">
 			<a href="/register">Registreer</a>

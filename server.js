@@ -105,10 +105,10 @@ app.get("/dashboard", function (req, res) {
 });
 
 app.get("/login", function (req, res) {
-	res.render("login", { title: "Login", message: req.user });
+	res.render("login", { title: "Login" });
 });
 app.get("/register", function (req, res) {
-	res.render("register", { title: "Register" });
+	res.render("register", { title: "Register", message: req.query.error });
 });
 
 app.listen(3000, () => console.log("Running on http://localhost:3000"));

@@ -1,21 +1,36 @@
-<form action="/login" method="POST" class="login">
+<form action="/register" method="POST" class="login">
 	<div class="devider"></div>
 	<div class="container"><div class="header"><img src="/static/logo.png" />unch</div></div>
 	<div class="devider"></div>
 
 	<div class="container">
 		<div class="header title">Registreer</div>
+		{{#if message}}
+			<div class="message">{{message}}</div>
+		{{/if}}
 		<div class="email">
-			<input type="text" name="username" placeholder="Email" />
+			<input type="email" name="email" placeholder="Email" required />
+		</div>
+		<div class="email">
+			<input type="text" minlength="5" name="firstname" placeholder="Voornaam" required />
+		</div>
+		<div class="email">
+			<input type="text" minlength="5" name="lastname" placeholder="Achternaam" required />
+		</div>
+		<div class="email">
+			<input type="text" name="leerlingnummer" placeholder="Leerlingnummer" required />
 		</div>
 		<div class="password">
-			<input type="password" name="password" placeholder="Wachtwoord" />
+			<input type="password" minlength="8" name="password" placeholder="Wachtwoord" required />
+		</div>
+		<div class="password">
+			<input type="password" minlength="8" name="passwordconfirm" placeholder="Herhaal wachtwoord" required />
 		</div>
 		<div class="login-btn">
-			<input type="submit" value="Log In" />
+			<input type="submit" value="Registreer" />
 		</div>
 		<div class="register-btn">
-			<a href="/register">Registreer</a>
+			<a href="/login">Login</a>
 		</div>
 	</div>
 </form>

@@ -70,4 +70,40 @@ module.exports = (app) => {
 			}
 		})(req, res, next);
 	});
+
+	app.post("/register", (req, res, next) => {
+		const { email, firstname, lastname, leerlingnummer, password, passwordconfirm } = req.body;
+
+		if (!email || !firstname || !lastname || !leerlingnummer || !password || !passwordconfirm) {
+			return res.redirect("register?error=Empty%20fields");
+		}
+		if (password !== passwordconfirm) {
+			return res.redirect("register?error=Password%20not%20same");
+		}
+
+		req.uest(
+			{
+				method: "POST",
+				url: "/api/users",
+				body: {
+					firstName: firstname,
+					lastName: lastname,
+					email,
+					leerlingNummer: leerlingnummer,
+					password,
+				},
+			},
+			(_err, _res, body) => {
+				if (!body.success) {
+					let message = body.error.replace(/_/, " ");
+					if (body.data) {
+						message += " " + body.data.field;
+					}
+					return res.redirect("register?error=" + message);
+				} else {
+					res.redirect("/login");
+				}
+			}
+		);
+	});
 };

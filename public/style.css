@@ -437,6 +437,10 @@ body {
 .login .container .title {
 	margin-bottom: 15px;
 }
+.login .container .message {
+	color: red;
+	font-size: 40px;
+}
 
 .login .email,
 .login .password {
