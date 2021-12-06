@@ -106,20 +106,20 @@ router.get("/", () => {
 
 router.get("/:id", async (req, res) => {
 	// Not loggedin return 401
-	// if (!req.isAuthenticated()) {
-	// 	return res.status(401).send({
-	// 		success: false,
-	// 		error: "unauthorized",
-	// 	});
-	// }
+	if (!req.isAuthenticated()) {
+		return res.status(401).send({
+			success: false,
+			error: "unauthorized",
+		});
+	}
 
-	// // Only vendors can access orders
-	// if (!req.user.vendor) {
-	// 	return res.status(403).send({
-	// 		success: false,
-	// 		error: "forbidden",
-	// 	});
-	// }
+	// Only vendors can access orders
+	if (!req.user.vendor) {
+		return res.status(403).send({
+			success: false,
+			error: "forbidden",
+		});
+	}
 
 	db.query(
 		`SELECT orders.id,
