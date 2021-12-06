@@ -70,6 +70,10 @@ body {
 	line-height: 40px;
 }
 
+.container .header img {
+	height: 40px;
+}
+
 /**HOME**/
 .shop {
 	display: grid;
@@ -199,7 +203,7 @@ body {
 }
 
 .cart .cart-items {
-	height: 53vh;
+	height: 44vh;
 	overflow-y: scroll;
 	margin-bottom: 10px;
 	margin-top: 15px;
@@ -264,6 +268,25 @@ body {
 	font-size: 30px;
 
 	width: calc(100% - 26px);
+
+	cursor: pointer;
+}
+
+.cart .logout {
+	display: flex;
+	justify-content: center;
+	border-radius: 30px;
+	background-color: transparent;
+	border: 3px solid #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	margin-top: 10px;
+	padding: 5px 10px;
+	color: #3413e1;
+	font-size: 30px;
+
+	width: calc(100% - 26px);
+	text-decoration: none;
 
 	cursor: pointer;
 }
@@ -396,5 +419,90 @@ body {
 	background-color: white;
 	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
 
+	cursor: pointer;
+}
+
+/** LOGIN **/
+.login {
+	max-width: 300px;
+	margin: auto;
+}
+
+.login .container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login .container .title {
+	margin-bottom: 15px;
+}
+
+.login .email,
+.login .password {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.login input {
+	border: none;
+	outline: none;
+	box-sizing: border-box;
+	border-bottom: 2px #3413e1 solid;
+	background-color: transparent;
+
+	padding: 10px;
+	color: white;
+	font-size: 20px;
+
+	width: calc(100% - 20px);
+
+	margin-bottom: 10px;
+}
+
+.login input::placeholder {
+	color: white;
+}
+.login .login-btn {
+	width: 100%;
+}
+.login .login-btn input {
+	outline: none;
+	border: none;
+	border-radius: 30px;
+	background-color: #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 10px;
+	color: white;
+	font-size: 20px;
+
+	width: calc(100%);
+
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+
+.login .register-btn {
+	width: 100%;
+}
+.login .register-btn a {
+	display: block;
+	box-sizing: border-box;
+	text-decoration: none;
+	outline: none;
+	border: 3px #3413e1 solid;
+	border-radius: 30px;
+	background-color: transparent;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 7px;
+	color: white;
+	font-size: 20px;
+	text-align: center;
+	width: calc(100%);
+
+	margin-bottom: 10px;
 	cursor: pointer;
 }

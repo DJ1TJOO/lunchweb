@@ -227,14 +227,14 @@ const addToCart = (product) => {
 
 // Set min date for order
 const date = document.getElementById("date");
-date.setAttribute("min", new Date().toISOString().split("T")[0]);
+date.setAttribute("min", new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
 
 // Check order and submit
 const order = document.getElementById("order");
 order.addEventListener("click", () => {
 	const date = new Date(document.getElementById("date").value);
 	// Already gone date
-	if (!date || date.getTime() < Date.now()) {
+	if (!date || date.getTime() < new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).getTime()) {
 		// TODO: error message
 		return;
 	}
@@ -245,6 +245,7 @@ order.addEventListener("click", () => {
 		return;
 	}
 
+	// TODO: confirm
 	fetch("/api/orders", {
 		method: "POST",
 		headers: {

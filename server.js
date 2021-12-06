@@ -67,6 +67,43 @@ app.get("/", function (req, res) {
 	);
 });
 
+app.get("/dashboard", function (req, res) {
+	if (!req.isAuthenticated()) return res.redirect("/login");
+	if (!req.user.vendor) return res.redirect("/");
+
+	req.uest(
+		{
+			method: "GET",
+			url: "/api/products",
+		},
+		(_err, _res, productData) =>
+			req.uest(
+				{
+					method: "GET",
+					url: "/api/product-types",
+				},
+				(_err, _res, productTypes) =>
+					req.uest(
+						{
+							method: "GET",
+							url: "/api/orders",
+						},
+						(_err, _res, orders) => {
+							const types = [...new Set(productTypes.data.map((productType) => productType.name))];
+							const products = {};
+							for (let i = 0; i < types.length; i++) {
+								const type = types[i];
+								products[type] = productData.data.filter((product) => product.type === type);
+							}
+							orders.data = orders.data.sort((a, b) => a.deliver - b.deliver);
+
+							res.render("dashboard", { title: "Dashboard", products: products, categories: types, productTypes: productTypes.data, orders: orders.data });
+						}
+					)
+			)
+	);
+});
+
 app.get("/login", function (req, res) {
 	res.render("login", { title: "Login", message: req.user });
 });

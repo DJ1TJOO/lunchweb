@@ -60,7 +60,12 @@ module.exports = (app) => {
 			} else {
 				req.logIn(user, (err) => {
 					if (err) return res.send(err);
-					res.redirect("/");
+
+					if (user.vendor) {
+						res.redirect("/dashboard");
+					} else {
+						res.redirect("/");
+					}
 				});
 			}
 		})(req, res, next);

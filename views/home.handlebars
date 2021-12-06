@@ -2,7 +2,7 @@
 <script src="/static/shop.js" id="shop-script" data-product-types='{{{json productTypes}}}' defer></script>
 
 <div class="devider"></div>
-<div class="container"><div class="header">Lunch</div></div>
+<div class="container"><div class="header"><img src="/static/logo.png">unch</div></div>
 <div class="devider"></div>
 
 <div class="shop">
@@ -31,11 +31,12 @@
 		</div>
 		<div class="total">
 			<div class="title">Totaal</div>
-			<div class="title price" id="total">{{formatPrice 2}}</div>
+			<div class="title price" id="total">{{formatPrice 0}}</div>
 		</div>
 		<div class="date">
 			<input type="date" id="date"/>
 		</div>
 		<div class="order" id="order">Bestellen</div>
+		<a href="/logout" class="logout">Logout</a>
 	</div>
 </div>

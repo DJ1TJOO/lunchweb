@@ -50,7 +50,7 @@ const convertToOrderObject = (rows) => ({
 		}),
 });
 
-router.get("/", () => {
+router.get("/", (req, res) => {
 	// Not loggedin return 401
 	if (!req.isAuthenticated()) {
 		return res.status(401).send({
@@ -112,7 +112,7 @@ router.get("/", () => {
 
 			res.send({
 				success: true,
-				data: toCamel(results),
+				data: toCamel(orders),
 			});
 		})
 		.catch((error) => {

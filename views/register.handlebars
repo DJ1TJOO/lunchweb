@@ -1,26 +1,21 @@
-<div id="register">
-	<div>
-		<label>Email:</label>
-		<input type="text" name="email" />
+<form action="/login" method="POST" class="login">
+	<div class="devider"></div>
+	<div class="container"><div class="header"><img src="/static/logo.png" />unch</div></div>
+	<div class="devider"></div>
+
+	<div class="container">
+		<div class="header title">Registreer</div>
+		<div class="email">
+			<input type="text" name="username" placeholder="Email" />
+		</div>
+		<div class="password">
+			<input type="password" name="password" placeholder="Wachtwoord" />
+		</div>
+		<div class="login-btn">
+			<input type="submit" value="Log In" />
+		</div>
+		<div class="register-btn">
+			<a href="/register">Registreer</a>
+		</div>
 	</div>
-	<div>
-		<label>First name:</label>
-		<input type="text" name="firstName" />
-	</div>
-	<div>
-		<label>Last name:</label>
-		<input type="text" name="lastName" />
-	</div>
-	<div>
-		<label>Password:</label>
-		<input type="password" name="password" />
-	</div>
-	<div>
-		<button onclick="register()">Register In</button>
-	</div>
-	<script>
-		async function register() { const inputs = [...document.getElementById("register").getElementsByTagName("input")]; const body = {}; for(let i=0;i<inputs.length; i++) {
-		body[inputs[i].name]=inputs[i].value; } const res = await fetch('/api/users/', { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json",
-		}, body: JSON.stringify(body) }).then((res)=> res.json()); console.log(res) }
-	</script>
-</div>
+</form>

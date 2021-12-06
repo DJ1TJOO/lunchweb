@@ -1,14 +1,21 @@
-{{message}}
-<form action="/login" method="POST">
-	<div>
-		<label>Email:</label>
-		<input type="text" name="username" />
-	</div>
-	<div>
-		<label>Password:</label>
-		<input type="password" name="password" />
-	</div>
-	<div>
-		<input type="submit" value="Log In" />
+<form action="/login" method="POST" class="login">
+	<div class="devider"></div>
+	<div class="container"><div class="header"><img src="/static/logo.png" />unch</div></div>
+	<div class="devider"></div>
+
+	<div class="container">
+		<div class="header title">Login</div>
+		<div class="email">
+			<input type="text" name="username" placeholder="Email" />
+		</div>
+		<div class="password">
+			<input type="password" name="password" placeholder="Wachtwoord" />
+		</div>
+		<div class="login-btn">
+			<input type="submit" value="Log In" />
+		</div>
+		<div class="register-btn">
+			<a href="/register">Registreer</a>
+		</div>
 	</div>
 </form>
