@@ -8,6 +8,10 @@ const router = Router();
 const convertToOrderObject = (rows) => ({
 	id: rows[0].id,
 	user_id: rows[0].user_id,
+	firstname: rows[0].first_name,
+	lastname: rows[0].last_name,
+	email: rows[0].email,
+	leerling_nummer: rows[0].leerling_nummer,
 	status: rows[0].status,
 	deliver: rows[0].deliver,
 	products: rows
@@ -66,6 +70,10 @@ router.get("/", () => {
 	db.query(
 		`SELECT orders.id,
                 orders.user_id,
+				users.first_name,
+				users.last_name,
+				users.email,
+				users.leerling_nummer,
                 orders.status,
                 orders.deliver,
                 order_product.id AS order_product_id,
@@ -83,12 +91,25 @@ router.get("/", () => {
 				order_product_options.value AS order_product_option_value,
 				product_type_option_choices.name AS product_type_option_choices_name FROM orders
         LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+		LEFT OUTER JOIN users ON orders.user_id = users.id
         LEFT OUTER JOIN products ON order_product.product_id = products.id
         LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 		LEFT OUTER JOIN product_types ON products.type = product_types.id
         LEFT OUTER JOIN product_type_option_choices ON order_product_options.value = product_type_option_choices.id`
 	)
 		.then(([results]) => {
+			const orderRows = {};
+			for (let i = 0; i < results.length; i++) {
+				const result = results[i];
+				if (!orderRows[result.id]) orderRows[result.id] = [];
+				orderRows[result.id].push(result);
+			}
+
+			const orders = [];
+			for (const id in orderRows) {
+				orders.push(convertToOrderObject(orderRows[id]));
+			}
+
 			res.send({
 				success: true,
 				data: toCamel(results),
@@ -124,6 +145,10 @@ router.get("/:id", async (req, res) => {
 	db.query(
 		`SELECT orders.id,
                 orders.user_id,
+				users.first_name,
+				users.last_name,
+				users.email,
+				users.leerling_nummer,
                 orders.status,
                 orders.deliver,
                 order_product.id AS order_product_id,
@@ -141,6 +166,7 @@ router.get("/:id", async (req, res) => {
 				order_product_options.value AS order_product_option_value,
 				product_type_option_choices.name AS product_type_option_choices_name FROM orders
         LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+		LEFT OUTER JOIN users ON orders.user_id = users.id
         LEFT OUTER JOIN products ON order_product.product_id = products.id
         LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 		LEFT OUTER JOIN product_types ON products.type = product_types.id
@@ -234,6 +260,10 @@ router.post("/", async (req, res) => {
 					db.query(
 						`SELECT orders.id,
 							orders.user_id,
+							users.first_name,
+							users.last_name,
+							users.email,
+							users.leerling_nummer,
 							orders.status,
 							orders.deliver,
 							order_product.id AS order_product_id,
@@ -251,6 +281,7 @@ router.post("/", async (req, res) => {
 							order_product_options.value AS order_product_option_value,
 							product_type_option_choices.name AS product_type_option_choices_name FROM orders
 					LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+					LEFT OUTER JOIN users ON orders.user_id = users.id
 					LEFT OUTER JOIN products ON order_product.product_id = products.id
 					LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 					LEFT OUTER JOIN product_types ON products.type = product_types.id
@@ -261,7 +292,7 @@ router.post("/", async (req, res) => {
 						.then(([results]) => {
 							res.send({
 								success: true,
-								data: toCamel(results),
+								data: toCamel(convertToOrderObject(results)),
 							});
 						})
 						.catch((error) => {
@@ -312,6 +343,10 @@ router.delete("/:id", async (req, res) => {
 	db.query(
 		`SELECT orders.id,
                 orders.user_id,
+				users.first_name,
+				users.last_name,
+				users.email,
+				users.leerling_nummer,
                 orders.status,
                 orders.deliver,
                 order_product.id AS order_product_id,
@@ -329,6 +364,7 @@ router.delete("/:id", async (req, res) => {
 				order_product_options.value AS order_product_option_value,
 				product_type_option_choices.name AS product_type_option_choices_name FROM orders
         LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
+		LEFT OUTER JOIN users ON orders.user_id = users.id
         LEFT OUTER JOIN products ON order_product.product_id = products.id
         LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 		LEFT OUTER JOIN product_types ON products.type = product_types.id
@@ -379,7 +415,7 @@ router.delete("/:id", async (req, res) => {
 
 			res.send({
 				success: true,
-				data: toCamel(results),
+				data: toCamel(convertToOrderObject(results)),
 			});
 		})
 		.catch((error) => {
