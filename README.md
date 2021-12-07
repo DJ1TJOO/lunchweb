@@ -7,6 +7,5 @@ https://drawsql.app/lunchapp/diagrams/lunchapp
 
 **TODO:**
 
--   Dashboard: wireframe, design, page and functionaltity
--   Design document add dashboard designs
+-   Dashboard: page and functionaltity
 -   Submit
