@@ -11,6 +11,26 @@ body {
 	background: linear-gradient(45deg, rgba(0, 128, 255, 1) 0%, rgba(138, 77, 229, 1) 100%);
 }
 
+a.btn {
+	display: block;
+	box-sizing: border-box;
+	text-decoration: none;
+	outline: none;
+	border: 3px #3413e1 solid;
+	border-radius: 30px;
+	background-color: transparent;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 7px;
+	color: #3413e1;
+	font-size: 20px;
+	text-align: center;
+	width: calc(100%);
+
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+
 .circle {
 	position: absolute;
 	width: 30vw;
@@ -586,11 +606,114 @@ body {
 	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
 
 	padding: 7px;
-	color: white;
+	color: #3413e1;
 	font-size: 20px;
 	text-align: center;
 	width: calc(100%);
 
 	margin-bottom: 10px;
 	cursor: pointer;
+}
+
+/** DASHBOARD **/
+
+.dashboard {
+	grid-auto-rows: 1fr;
+}
+
+.dashboard .products {
+	border-radius: 25px;
+}
+
+.dashboard .products .header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: calc(100% - 20px);
+	padding: 10px;
+}
+
+.dashboard .products .title {
+	color: white;
+	font-size: 50px;
+	align-self: flex-start;
+}
+
+.dashboard .products .order {
+	position: relative;
+	outline: none;
+	border: none;
+	border-radius: 30px;
+	background-color: #3413e1;
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+
+	padding: 10px 20px;
+	color: white;
+	font-size: 20px;
+
+	width: calc(100% - 40px);
+
+	margin-bottom: 10px;
+}
+
+.dashboard .products .order .complete {
+	color: white;
+	border-color: white;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: 170px;
+	box-shadow: none;
+}
+
+.dashboard .products .order .customer {
+	margin-top: -5px;
+	margin-bottom: 10px;
+}
+
+.dashboard .products .order .order-item {
+	margin-bottom: 10px;
+}
+
+.dashboard .products .order .info {
+	color: rgba(255, 255, 255, 0.75);
+	font-size: 20px;
+	line-height: 23px;
+}
+
+.dashboard .products .order .info-light {
+	color: rgba(255, 255, 255, 1);
+}
+
+.dashboard .products .order .value {
+	color: white;
+	font-size: 30px;
+	line-height: 30px;
+}
+
+.dashboard .products .order .row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	flex: 1;
+}
+
+.dashboard .products .order .column {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.dashboard .products .btn {
+	max-width: 200px;
+	margin-bottom: 0;
+}
+
+.dashboard .product {
+	width: calc(100% - 40px);
+}
+
+.dashboard .cart-items {
+	height: 67vh;
 }

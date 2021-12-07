@@ -1,6 +1,69 @@
-<div class="container">
-	{{!-- {{{json products}}} --}}
-	{{!-- {{{json categories}}} --}}
-	{{!-- {{{json productTypes}}} --}}
-	{{{json orders}}}
+{{!-- {{{json products}}} --}}
+{{!-- {{{json categories}}} --}}
+{{!-- {{{json productTypes}}} --}}
+{{!-- {{{json orders}}} --}}
+<script src="/static/dashboard.js" id="dashboard-script" defer></script>
+
+<div class="devider"></div>
+<div class="container"><div class="header"><img src="/static/logo.png" />unch</div></div>
+<div class="devider"></div>
+<div id="dashboard-message-container"></div>
+<div class="shop dashboard">
+	<div class="container products">
+		<div class="header">
+			<div class="title">Bestellingen</div>
+			<a class="btn" href="/">Bestellen</a></div>
+		{{#each orders}}
+			<div class="order">
+				<a class="complete btn" onclick="completeOrder(JSON.parse('{{json this}}'))">Afronden</a>
+				<div class="row">
+					<div class="column info">Datum</div>
+				</div>
+				<div class="row customer">
+					<div class="column value">{{this.deliver}}</div>
+				</div>
+				<div class="row">
+					<div class="column info">Klant</div>
+					<div class="column info">Email</div>
+				</div>
+				<div class="row customer">
+					<div class="column value">{{this.firstname}} {{this.lastname}}</div>
+					<div class="column value">{{this.email}}</div>
+				</div>
+				<div class="row">
+					<div class="row info">
+						<div class="column">Producten</div>
+						<div class="column">Aantal</div>
+					</div>
+					<div class="column info">Opties</div>
+				</div>
+				{{#each this.products}}
+					<div class="row order-item">
+						<div class="row value">
+							<div class="column">{{this.title}}</div>
+							<div class="column">{{this.quantity}}</div>
+						</div>
+						<div class="column value">
+							{{#each this.options}}
+								<div class="info info-light">{{this.name}}: {{getOptionValue this}}</div>
+							{{/each}}
+						</div>
+					</div>
+				{{/each}}
+			</div>
+		{{/each}}
+	</div>
+	<div class="container cart">
+		<div class="header">Producten</div>
+		<div id="cart-items" class="cart-items">
+			{{#each products}}
+				<div class="product" onclick="window.location.href = '/dashboard/edit?={{this.id}}'">
+					<div class="title">{{this.title}}</div>
+					<div class="summary">{{{this.summary}}}</div>
+					<div class="price">{{formatPrice this.price}}</div>
+				</div>
+			{{/each}}
+		</div>
+		<div class="order" id="add">Toevoegen</div>
+	</div>
 </div>

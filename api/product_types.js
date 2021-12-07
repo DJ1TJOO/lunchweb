@@ -541,7 +541,7 @@ router.delete("/:id", async (req, res) => {
 		}
 
 		const [deleteResults] = await db.query(
-			`DELETE pt,pto,ptoc FROM product_types as pt
+			`DELETE FROM product_types as pt
                 LEFT OUTER JOIN product_type_options as pto
                     ON pto.product_type_id = pt.id
                 LEFT OUTER JOIN product_type_option_choices as ptoc

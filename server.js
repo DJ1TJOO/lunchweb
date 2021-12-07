@@ -31,6 +31,7 @@ app.engine(
 					.replace(".", "dot")
 					.replace(",", ".")
 					.replace("dot", ","),
+			getOptionValue: (option) => (option.type === 0 ? (option.value ? "ja" : "nee") : option.value),
 		},
 	})
 );
@@ -90,14 +91,9 @@ app.get("/dashboard", function (req, res) {
 						},
 						(_err, _res, orders) => {
 							const types = [...new Set(productTypes.data.map((productType) => productType.name))];
-							const products = {};
-							for (let i = 0; i < types.length; i++) {
-								const type = types[i];
-								products[type] = productData.data.filter((product) => product.type === type);
-							}
-							orders.data = orders.data.sort((a, b) => a.deliver - b.deliver);
+							orders.data = orders.data.sort((a, b) => a.deliver - b.deliver).filter((x) => x.status === 0);
 
-							res.render("dashboard", { title: "Dashboard", products: products, categories: types, productTypes: productTypes.data, orders: orders.data });
+							res.render("dashboard", { title: "Dashboard", products: productData.data, categories: types, productTypes: productTypes.data, orders: orders.data });
 						}
 					)
 			)

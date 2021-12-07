@@ -383,24 +383,8 @@ router.delete("/:id", async (req, res) => {
 
 			// Delete order and order_products
 			const [deleteResults] = await db.query(
-				`DELETE orders.id,
-					orders.user_id,
-					orders.status,
-					orders.deliver,
-					order_product.id AS order_product_id,
-					order_product.quantity,
-					order_product.note,
-					products.id AS product_id,
-					products.title,
-					products.summary,
-					products.price,
-					products.type,
-					order_product_options.id AS order_product_option_id,
-					order_product_options.name AS order_product_option_name,
-					order_product_options.type AS order_product_option_type,
-					order_product_options.value AS order_product_option_value FROM orders
+				`DELETE orders, order_product, order_product_options FROM orders
 			LEFT OUTER JOIN order_product ON orders.id = order_product.order_id
-			LEFT OUTER JOIN products ON order_product.product_id = products.id
         	LEFT OUTER JOIN order_product_options ON order_product.id = order_product_options.order_product_id
 			WHERE orders.id = ?`,
 				[req.params.id]
