@@ -173,18 +173,6 @@ router.post("/", async (req, res) => {
 	}
 
 	if (typeof summary !== "undefined") {
-		// Summary too short
-		if (summary.length < 3) {
-			return res.status(422).send({
-				success: false,
-				error: "too_short",
-				data: {
-					field: "summary",
-					min: 3,
-				},
-			});
-		}
-
 		// Summary too long
 		if (summary.length > 255) {
 			return res.status(422).send({
@@ -202,7 +190,7 @@ router.post("/", async (req, res) => {
 		"INSERT INTO products (title" +
 			(typeof summary !== "undefined" ? ",summary" : "") +
 			",price,type) VALUES (?," +
-			(typeof summary !== "undefined" ? summary + "," : "") +
+			(typeof summary !== "undefined" ? "'" + summary + "'," : "") +
 			"?,?)",
 		[title, price, type]
 	)
@@ -368,18 +356,6 @@ router.patch("/:id", async (req, res) => {
 	}
 
 	if (typeof summary !== "undefined") {
-		// Summary too short
-		if (summary.length < 3) {
-			return res.status(422).send({
-				success: false,
-				error: "too_short",
-				data: {
-					field: "summary",
-					min: 3,
-				},
-			});
-		}
-
 		// Summary too long
 		if (summary.length > 255) {
 			return res.status(422).send({

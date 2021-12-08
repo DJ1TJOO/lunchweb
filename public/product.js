@@ -405,6 +405,7 @@ save.addEventListener("click", async () => {
 			});
 			const jsonRes = await res.json();
 			if (!jsonRes.success) {
+				console.log(jsonRes);
 				createErrorMessage("Kon oude categorie niet verwijderen. Probeer opnieuw");
 				return;
 			}
@@ -428,6 +429,7 @@ save.addEventListener("click", async () => {
 			});
 			const jsonRes = await res.json();
 			if (!jsonRes.success) {
+				console.log(jsonRes);
 				createErrorMessage("Kon nieuwe categorie niet aanmaken. Probeer opnieuw");
 				return;
 			} else {
@@ -452,6 +454,7 @@ save.addEventListener("click", async () => {
 			});
 			const jsonRes = await res.json();
 			if (!jsonRes.success) {
+				console.log(jsonRes);
 				createErrorMessage("Kon categorie niet updaten. Probeer opnieuw");
 				return;
 			} else {
@@ -481,6 +484,7 @@ save.addEventListener("click", async () => {
 			});
 			const jsonRes = await res.json();
 			if (!jsonRes.success) {
+				console.log(jsonRes);
 				createErrorMessage("Kon nieuw product niet aanmaken. Probeer opnieuw");
 				return;
 			} else {
@@ -507,6 +511,7 @@ save.addEventListener("click", async () => {
 			});
 			const jsonRes = await res.json();
 			if (!jsonRes.success) {
+				console.log(jsonRes);
 				createErrorMessage("Kon product niet updaten. Probeer opnieuw");
 				return;
 			} else {
