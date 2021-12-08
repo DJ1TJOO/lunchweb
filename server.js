@@ -100,6 +100,36 @@ app.get("/dashboard", function (req, res) {
 	);
 });
 
+app.get("/dashboard/edit/:id", function (req, res) {
+	if (!req.isAuthenticated()) return res.redirect("/login");
+	if (!req.user.vendor) return res.redirect("/");
+
+	req.uest(
+		{
+			method: "GET",
+			url: "/api/products",
+		},
+		(_err, _res, productData) =>
+			req.uest(
+				{
+					method: "GET",
+					url: "/api/product-types",
+				},
+				(_err, _res, productTypes) => {
+					const types = [...new Set(productTypes.data.map((productType) => productType.name))];
+
+					res.render("product", {
+						title: "Dashboard",
+						product: productData.data.find((x) => x.id === Number(req.params.id)) || {},
+						products: productData.data,
+						categories: types,
+						productTypes: productTypes.data,
+					});
+				}
+			)
+	);
+});
+
 app.get("/login", function (req, res) {
 	res.render("login", { title: "Login" });
 });

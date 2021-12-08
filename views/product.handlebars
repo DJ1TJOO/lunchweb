@@ -1,0 +1,59 @@
+<script src="/static/product.js" id="product-script" data-product="{{json product}}" data-types="{{json productTypes}}" defer></script>
+
+<div class="devider"></div>
+<div class="container"><div class="header"><img src="/static/logo.png" />unch</div></div>
+<div class="devider"></div>
+<div id="dashboard-message-container"></div>
+<div class="shop dashboard product-edit">
+	<div class="container products">
+		<div class="header">
+			<div class="title">Product bewerken</div>
+			<div>
+				<a class="btn" id="delete" onclick="deleteProduct(JSON.parse('{{json product}}'))">Verwijderen</a>
+				<a class="btn" id="save">Opslaan</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="column info">Naam</div>
+			<div class="column info">Prijs</div>
+		</div>
+		<div class="row">
+			<div class="column"><input type="text" placeholder="Naam" value="{{product.title}}" id="name" /></div>
+			<div class="column"><input type="text" placeholder="Prijs" value="{{product.price}}" id="price" /></div>
+		</div>
+		<div class="row">
+			<div class="column info">Beschrijving</div>
+		</div>
+		<div class="row">
+			<div class="column"><input type="text" placeholder="Beschrijving" value="{{product.summary}}" id="summary" /></div>
+		</div>
+		<div class="row">
+			<div class="column info">Categorie naam</div>
+		</div>
+		<div class="row">
+			<div class="column"><input type="text" placeholder="Categorie" value="{{product.type}}" id="type" /></div>
+		</div>
+		<div class="row">
+			<div class="column info">Opties</div>
+			<div class="column info">Keuzes</div>
+		</div>
+		<div class="row">
+			<div class="column">
+				<div class="add" id="add-option">+</div>
+			</div>
+		</div>
+	</div>
+	<div class="container cart">
+		<div class="header">Producten</div>
+		<div id="cart-items" class="cart-items">
+			{{#each products}}
+				<div class="product" onclick="window.location.href = '/dashboard/edit/{{this.id}}'">
+					<div class="title">{{this.title}}</div>
+					<div class="summary">{{{this.summary}}}</div>
+					<div class="price">{{formatPrice this.price}}</div>
+				</div>
+			{{/each}}
+		</div>
+		<div class="order" id="add" onclick="window.location.href = '/dashboard/edit/-1'">Toevoegen</div>
+	</div>
+</div>

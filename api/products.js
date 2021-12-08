@@ -151,7 +151,7 @@ router.post("/", async (req, res) => {
 	}
 
 	try {
-		const [typeResult] = await db.query(`SELECT count(*) FROM types WHERE id = ?`, [type]);
+		const [typeResult] = await db.query(`SELECT count(*) FROM product_types WHERE id = ?`, [type]);
 
 		// Type doesn't exists
 		if (typeResult[0]["count(*)"] < 1) {
@@ -198,7 +198,14 @@ router.post("/", async (req, res) => {
 		}
 	}
 
-	db.query("INSERT INTO products (title,summary,price,type) VALUES (?,?,?,?)", [title, summary, price, type])
+	db.query(
+		"INSERT INTO products (title" +
+			(typeof summary !== "undefined" ? ",summary" : "") +
+			",price,type) VALUES (?," +
+			(typeof summary !== "undefined" ? summary + "," : "") +
+			"?,?)",
+		[title, price, type]
+	)
 		.then(([results]) => {
 			// Select product from db
 			db.query(
@@ -336,7 +343,7 @@ router.patch("/:id", async (req, res) => {
 		}
 
 		try {
-			const [typeResult] = await db.query(`SELECT count(*) FROM types WHERE id = ?`, [type]);
+			const [typeResult] = await db.query(`SELECT count(*) FROM product_types WHERE id = ?`, [type]);
 
 			// Type doesn't exists
 			if (typeResult[0]["count(*)"] < 1) {

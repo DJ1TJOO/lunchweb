@@ -61,7 +61,6 @@ const createConfirgMessage = (confirm, cbConfirm, cbReject) => {
 };
 
 const completeOrder = (order) => {
-	console.log(order);
 	createConfirgMessage(
 		"Weet u zeker dat u de bestelling wilt afronden?",
 		() =>

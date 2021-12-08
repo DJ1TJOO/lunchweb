@@ -390,7 +390,7 @@ router.patch("/:id", async (req, res) => {
 		}
 
 		try {
-			const [emailResult] = await db.query(`SELECT count(*) FROM users WHERE email = ?`, [email]);
+			const [emailResult] = await db.query(`SELECT count(*) FROM users WHERE email = ? AND NOT id = ?`, [email, req.params.id]);
 
 			// User already exists
 			if (emailResult[0]["count(*)"] > 0) {

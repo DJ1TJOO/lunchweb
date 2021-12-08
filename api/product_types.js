@@ -185,28 +185,6 @@ router.post("/", async (req, res) => {
 		});
 	}
 
-	try {
-		const [nameResult] = await db.query(`SELECT count(*) FROM product_types WHERE name = ?`, [name]);
-
-		// Product type already exists
-		if (nameResult[0]["count(*)"] > 0) {
-			return res.status(409).send({
-				success: false,
-				error: "taken",
-				data: {
-					field: "name",
-				},
-			});
-		}
-	} catch (error) {
-		console.log(error);
-		// Mysql error
-		res.status(500).send({
-			success: false,
-			error: "mysql",
-		});
-	}
-
 	if (options) {
 		if (!Array.isArray(options)) {
 			return res.status(422).send({
@@ -222,9 +200,6 @@ router.post("/", async (req, res) => {
 		if (
 			options.some(
 				(x) =>
-					// Check if all fields exists
-					!x.name ||
-					!x.type ||
 					// Check if fields are correct
 					typeof x.name !== "string" ||
 					typeof x.type !== "number" ||
@@ -232,7 +207,7 @@ router.post("/", async (req, res) => {
 					x.name.length < 3 ||
 					x.name.length > 255 ||
 					// Check types
-					((x.type === PRODUCT_TYPE_OPTIONS.chooseSelect || x.type === PRODUCT_TYPE_OPTIONS.select) && !x.choices) ||
+					(x.type === PRODUCT_TYPE_OPTIONS.select && !x.choices) ||
 					// Check if choices are correct
 					(x.choices && x.choices.some((y) => typeof y.name !== "string" || y.name.length < 3 || y.name.length > 255))
 			)
@@ -365,28 +340,6 @@ router.patch("/:id", async (req, res) => {
 				},
 			});
 		}
-
-		try {
-			const [nameResult] = await db.query(`SELECT count(*) FROM product_types WHERE name = ?`, [name]);
-
-			// Product type already exists
-			if (nameResult[0]["count(*)"] > 0) {
-				return res.status(409).send({
-					success: false,
-					error: "taken",
-					data: {
-						field: "name",
-					},
-				});
-			}
-		} catch (error) {
-			console.log(error);
-			// Mysql error
-			res.status(500).send({
-				success: false,
-				error: "mysql",
-			});
-		}
 	}
 
 	if (options) {
@@ -404,9 +357,6 @@ router.patch("/:id", async (req, res) => {
 		if (
 			options.some(
 				(x) =>
-					// Check if all fields exists
-					!x.name ||
-					!x.type ||
 					// Check if fields are correct
 					typeof x.name !== "string" ||
 					typeof x.type !== "number" ||
@@ -431,18 +381,28 @@ router.patch("/:id", async (req, res) => {
 	try {
 		if (name) {
 			// Update name product_type
-			const [updateResults] = await db.query("UPDATE product_types SET name=?", [name]);
+			const [updateResults] = await db.query("UPDATE product_types SET name= ? WHERE id = ?", [name, req.params.id]);
 		}
 
 		// Insert options
 		if (options) {
+			// Delete old options
+			const [deleteResults] = await db.query(
+				`DELETE product_type_option_choices,product_type_options FROM product_type_options
+                LEFT OUTER JOIN product_type_option_choices
+                    ON product_type_option_choices.product_type_option_id = product_type_options.id
+                WHERE product_type_options.product_type_id = ?`,
+				[req.params.id]
+			);
+
 			for (let i = 0; i < options.length; i++) {
 				const option = options[i];
+
 				// Insert option
 				const [insertOptionResults] = await db.query("INSERT INTO product_type_options (name,type,product_type_id) VALUES (?,?,?)", [
 					option.name,
 					option.type,
-					insertResults.insertId,
+					req.params.id,
 				]);
 
 				// Insert choices
@@ -468,7 +428,7 @@ router.patch("/:id", async (req, res) => {
                 LEFT OUTER JOIN product_type_option_choices as ptoc
                     ON ptoc.product_type_option_id = pto.id
                 WHERE pt.id = ?`,
-			[insertResults.insertId]
+			[req.params.id]
 		)
 			.then(([results]) => {
 				if (results.length < 1) {
@@ -541,7 +501,7 @@ router.delete("/:id", async (req, res) => {
 		}
 
 		const [deleteResults] = await db.query(
-			`DELETE FROM product_types as pt
+			`DELETE pt,pto,ptoc FROM product_types as pt
                 LEFT OUTER JOIN product_type_options as pto
                     ON pto.product_type_id = pt.id
                 LEFT OUTER JOIN product_type_option_choices as ptoc
